@@ -82,4 +82,32 @@ public function publicIndex()
             'deviceType' => $validated['device_type'] ?? null
         ]);
     }
+
+    /**
+     * Display gamer home page (same as HomeController@index but for gamer role)
+     */
+    public function home()
+    {
+        // Get the newest non-deleted games (11 most recent)
+        $newReleases = Game::where('is_deleted', false)
+                        ->orderBy('created_at', 'desc')
+                        ->take(11)
+                        ->get();
+
+        // Get all upcoming or ongoing events
+        $events = \App\Models\Event::with('game')
+            ->where(function($query) {
+                $query->where('start_date', '>', now()) // Upcoming events
+                      ->orWhere(function($subQuery) {
+                          $subQuery->where('start_date', '<=', now())
+                                    ->where('end_date', '>=', now()); // Ongoing events
+                      });
+            })
+            ->get();
+
+        return view('home', [
+            'newReleases' => $newReleases,
+            'events' => $events
+        ]);
+    }
 }

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en">                    <div class="bg-gray-200 h-48 flex items-center justify-content-center rounded overflow-hidden">
+                        @if($organizer->avatar)
+                            <img id="profile-preview" src="{{ asset('storage/' . $organizer->avatar) }}" alt="Profile Picture" class="w-full h-full object-cover">
+                            <span id="upload-text" class="text-gray-600 hidden">Upload Profile Picture</span>
+                        @elsed>
     <meta charset="UTF-8">
     <title>Organizer Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
