@@ -85,7 +85,7 @@
     <div id="map" data-lat="{{ $event->location_lat }}" data-lng="{{ $event->location_lng }}" data-title="{{ $event->location_name }}"></div>
     
     <div class="mt-4">
-        <a href="http://127.0.0.1:8000/admin/events" class="btn btn-secondary">
+        <a href="{{ url('/admin/events') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i> Back to Events
         </a>
     </div>
