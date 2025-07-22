@@ -166,9 +166,13 @@ public function organizerProfile()
 
     public function getAvatarUrlAttribute(): string
     {
-        return $this->avatar 
-            ? asset('storage/avatars/'.$this->avatar)
-            : asset('images/default-avatar.png');
+        if ($this->avatar) {
+            // Use direct image server for Digital Ocean compatibility
+            $filename = basename($this->avatar);
+            return url('/serve_avatar.php?f=' . $filename);
+        }
+        
+        return asset('images/default-avatar.png');
     }
 
     public function getBackgroundUrlAttribute(): string

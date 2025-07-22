@@ -61,12 +61,21 @@ public function update(Request $request)
         $avatar = $request->file('avatar');
         $filename = 'avatar_'.$userId.'_'.time().'.'.$avatar->getClientOriginalExtension();
         
+        // Ensure the avatars directory exists
+        $avatarsDir = storage_path('app/public/avatars');
+        if (!file_exists($avatarsDir)) {
+            mkdir($avatarsDir, 0755, true);
+        }
+        
         // Store the file
         $path = $avatar->storeAs('avatars', $filename, 'public');
         
         // Delete old avatar if it exists
         if ($user->avatar) {
-            Storage::disk('public')->delete($user->avatar);
+            $oldAvatarPath = storage_path('app/public/' . $user->avatar);
+            if (file_exists($oldAvatarPath)) {
+                unlink($oldAvatarPath);
+            }
         }
         
         $updateData['avatar'] = $path;

@@ -51,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
             storage_path('app'),
             storage_path('app/public'),
             storage_path('app/public/game_images'),
+            storage_path('app/public/avatars'),
         ];
 
         foreach ($directories as $dir) {
@@ -59,10 +60,16 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        // Create a test file to verify storage works
-        $testFile = storage_path('app/public/game_images/.gitkeep');
-        if (!file_exists($testFile)) {
-            file_put_contents($testFile, '');
+        // Create test files to verify storage works
+        $testFiles = [
+            storage_path('app/public/game_images/.gitkeep') => '',
+            storage_path('app/public/avatars/.gitkeep') => '',
+        ];
+
+        foreach ($testFiles as $file => $content) {
+            if (!file_exists($file)) {
+                file_put_contents($file, $content);
+            }
         }
     }
 }
