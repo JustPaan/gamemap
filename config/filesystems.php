@@ -44,10 +44,10 @@ return [
             'throw' => false,
         ],
 
-        // Dedicated disk for game images
+        // Direct public disk for game images (Digital Ocean compatible)
         'game_images' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/game_images'),
+            'root' => public_path('storage/game_images'),
             'url' => env('APP_URL').'/storage/game_images',
             'visibility' => 'public',
             'throw' => false,

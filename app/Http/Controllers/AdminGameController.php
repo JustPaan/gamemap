@@ -170,28 +170,20 @@ class AdminGameController extends Controller
      */
     protected function storeImage($image)
     {
-        // Store image using the game_images disk
+        // Generate unique filename
         $filename = time() . '_' . $image->getClientOriginalName();
-        $path = 'game_images/' . $filename;
         
-        // Store to storage/app/public/game_images/
-        $storagePath = $image->storeAs('game_images', $filename, 'public');
-        
-        // Ensure public symlink directory exists and copy file
+        // Ensure public storage directory exists
         $publicGameImagesDir = public_path('storage/game_images');
         if (!file_exists($publicGameImagesDir)) {
             mkdir($publicGameImagesDir, 0755, true);
         }
         
-        // Copy to public for immediate access (backup for symlink issues)
-        $sourcePath = storage_path('app/public/' . $storagePath);
-        $publicPath = public_path('storage/' . $storagePath);
+        // Store directly to public/storage/game_images (Digital Ocean compatible)
+        $image->move($publicGameImagesDir, $filename);
         
-        if (file_exists($sourcePath)) {
-            copy($sourcePath, $publicPath);
-        }
-        
-        return $storagePath;
+        // Return the path for database storage
+        return 'game_images/' . $filename;
     }
 
     /**
@@ -199,8 +191,17 @@ class AdminGameController extends Controller
      */
     protected function deleteImage($path)
     {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if ($path) {
+            // Delete from public storage
+            $publicPath = public_path('storage/' . $path);
+            if (file_exists($publicPath)) {
+                unlink($publicPath);
+            }
+            
+            // Also delete from Laravel storage if exists
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
         }
     }
 
