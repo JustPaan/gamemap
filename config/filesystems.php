@@ -44,15 +44,6 @@ return [
             'throw' => false,
         ],
 
-        // Direct public disk for game images (Digital Ocean compatible)
-        'game_images' => [
-            'driver' => 'local',
-            'root' => public_path('storage/game_images'),
-            'url' => env('APP_URL').'/storage/game_images',
-            'visibility' => 'public',
-            'throw' => false,
-        ],
-
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
