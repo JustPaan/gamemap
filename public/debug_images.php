@@ -1,25 +1,35 @@
 <?php
-echo "<h2>Image Debug Test - Updated</h2>";
+echo "<h2>Laravel Storage Test - Digital Ocean</h2>";
 
-// Check if storage directory exists
-$storageDir = __DIR__ . '/storage/game_images';
-echo "<p><strong>Storage Directory:</strong> $storageDir</p>";
-echo "<p><strong>Exists:</strong> " . (is_dir($storageDir) ? "YES" : "NO") . "</p>";
-echo "<p><strong>Writable:</strong> " . (is_writable($storageDir) ? "YES" : "NO") . "</p>";
+// Check Laravel storage directory
+$laravelStorageDir = __DIR__ . '/../storage/app/public/game_images';
+echo "<p><strong>Laravel Storage Directory:</strong> $laravelStorageDir</p>";
+echo "<p><strong>Exists:</strong> " . (is_dir($laravelStorageDir) ? "YES" : "NO") . "</p>";
+echo "<p><strong>Writable:</strong> " . (is_writable($laravelStorageDir) ? "YES" : "NO") . "</p>";
 
-// Create a simple test image (1x1 pixel PNG)
-$testImageData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77yQAAAABJRU5ErkJggg==');
-$testImagePath = $storageDir . '/test-image.png';
-
-if (file_put_contents($testImagePath, $testImageData)) {
-    echo "<p><strong>✅ Test image created:</strong> test-image.png</p>";
-} else {
-    echo "<p><strong>❌ Failed to create test image</strong></p>";
+// Create directory if it doesn't exist
+if (!is_dir($laravelStorageDir)) {
+    if (mkdir($laravelStorageDir, 0755, true)) {
+        echo "<p><strong>✅ Directory created successfully!</strong></p>";
+    } else {
+        echo "<p><strong>❌ Failed to create directory</strong></p>";
+    }
 }
 
-if (is_dir($storageDir)) {
-    $files = scandir($storageDir);
-    echo "<p><strong>Files in directory:</strong></p>";
+// Create a simple test image in Laravel storage
+$testImageData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77yQAAAABJRU5ErkJggg==');
+$testImagePath = $laravelStorageDir . '/test-image.png';
+
+if (file_put_contents($testImagePath, $testImageData)) {
+    echo "<p><strong>✅ Test image created in Laravel storage</strong></p>";
+} else {
+    echo "<p><strong>❌ Failed to create test image in Laravel storage</strong></p>";
+}
+
+// List files in Laravel storage
+if (is_dir($laravelStorageDir)) {
+    $files = scandir($laravelStorageDir);
+    echo "<p><strong>Files in Laravel storage:</strong></p>";
     echo "<ul>";
     foreach ($files as $file) {
         if ($file != '.' && $file != '..') {
@@ -29,12 +39,12 @@ if (is_dir($storageDir)) {
     echo "</ul>";
 }
 
-// Test image display
-echo "<h3>Image Display Test:</h3>";
-echo "<p>If you see a small dot below, images are working:</p>";
-echo "<img src='/storage/game_images/test-image.png' alt='Test' style='width:50px;height:50px;border:2px solid red;background:white;'>";
+// Test Laravel route-based image serving
+echo "<h3>Laravel Route Image Test:</h3>";
+echo "<p>Testing Laravel image serving route:</p>";
+echo "<img src='/storage/game_images/test-image.png' alt='Test via Laravel route' style='width:50px;height:50px;border:2px solid green;background:white;'>";
 
 echo "<hr>";
-echo "<p><strong>Next step:</strong> Try uploading a game image in the admin panel!</p>";
-echo "<p><a href='/admin/game2' style='padding:10px;background:blue;color:white;text-decoration:none;'>Go to Game Admin</a></p>";
+echo "<p><strong>✅ Ready to test:</strong> Upload a game image!</p>";
+echo "<p><a href='/admin/game2' style='padding:10px;background:green;color:white;text-decoration:none;'>Go to Game Admin</a></p>";
 ?>
