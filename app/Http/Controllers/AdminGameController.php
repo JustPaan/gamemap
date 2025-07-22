@@ -176,20 +176,6 @@ class AdminGameController extends Controller
         // Store to storage/app/public/game_images/ (Laravel standard)
         $storagePath = $image->storeAs('game_images', $filename, 'public');
         
-        // ALSO store to public/storage/game_images/ for direct access
-        $publicGameImagesDir = public_path('storage/game_images');
-        if (!file_exists($publicGameImagesDir)) {
-            mkdir($publicGameImagesDir, 0755, true);
-        }
-        
-        // Copy to public directory for immediate access
-        $sourcePath = storage_path('app/public/' . $storagePath);
-        $publicPath = public_path('storage/' . $storagePath);
-        
-        if (file_exists($sourcePath)) {
-            copy($sourcePath, $publicPath);
-        }
-        
         return $storagePath;
     }
 

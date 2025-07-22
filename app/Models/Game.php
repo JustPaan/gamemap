@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Game extends Model
 {
@@ -31,6 +32,7 @@ class Game extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image_path) {
+            // Use Laravel asset helper with storage path
             return asset('storage/' . $this->image_path);
         }
         

@@ -26,6 +26,17 @@ use App\Http\Controllers\Organizer\OrganizerEventSettingController;
 // Redirect root to login
 Route::redirect('/', '/login');
 
+// Image serving route for Digital Ocean compatibility
+Route::get('/storage/game_images/{filename}', function ($filename) {
+    $path = storage_path('app/public/game_images/' . $filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    
+    return response()->file($path);
+})->name('game.image');
+
 // Authentication Routes
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLogin')->name('login');
