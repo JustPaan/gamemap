@@ -34,8 +34,35 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
+        // Ensure storage directories exist (Digital Ocean fix)
+        $this->ensureStorageDirectories();
+
         View::composer('homeadmin', function ($view) {
             $view->with('users', User::all()); // Or any specific query
         });
+    }
+
+    /**
+     * Ensure storage directories exist for Digital Ocean compatibility
+     */
+    private function ensureStorageDirectories()
+    {
+        $directories = [
+            storage_path('app'),
+            storage_path('app/public'),
+            storage_path('app/public/game_images'),
+        ];
+
+        foreach ($directories as $dir) {
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
+        }
+
+        // Create a test file to verify storage works
+        $testFile = storage_path('app/public/game_images/.gitkeep');
+        if (!file_exists($testFile)) {
+            file_put_contents($testFile, '');
+        }
     }
 }
