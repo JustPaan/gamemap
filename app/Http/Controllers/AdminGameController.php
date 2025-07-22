@@ -170,24 +170,28 @@ class AdminGameController extends Controller
      */
     protected function storeImage($image)
     {
-        $path = $image->store('game_images', 'public');
+        // Store image using the game_images disk
+        $filename = time() . '_' . $image->getClientOriginalName();
+        $path = 'game_images/' . $filename;
         
-        // Also copy to public/storage for immediate access (workaround for symlink issues)
-        $sourcePath = storage_path('app/public/' . $path);
-        $publicPath = public_path('storage/' . $path);
+        // Store to storage/app/public/game_images/
+        $storagePath = $image->storeAs('game_images', $filename, 'public');
         
-        // Ensure directory exists
-        $publicDir = dirname($publicPath);
-        if (!file_exists($publicDir)) {
-            mkdir($publicDir, 0755, true);
+        // Ensure public symlink directory exists and copy file
+        $publicGameImagesDir = public_path('storage/game_images');
+        if (!file_exists($publicGameImagesDir)) {
+            mkdir($publicGameImagesDir, 0755, true);
         }
         
-        // Copy file
+        // Copy to public for immediate access (backup for symlink issues)
+        $sourcePath = storage_path('app/public/' . $storagePath);
+        $publicPath = public_path('storage/' . $storagePath);
+        
         if (file_exists($sourcePath)) {
             copy($sourcePath, $publicPath);
         }
         
-        return $path;
+        return $storagePath;
     }
 
     /**

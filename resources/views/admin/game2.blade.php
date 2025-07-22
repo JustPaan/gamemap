@@ -210,7 +210,7 @@
                 <tr class="{{ $game->trashed() ? 'trashed-row' : '' }}">
                     <td>
                         @if($game->image_path)
-                            <img src="{{ asset('storage/' . $game->image_path) }}" alt="{{ $game->name }}" class="game-image">
+                            <img src="{{ $game->image_url }}" alt="{{ $game->name }}" class="game-image">
                         @else
                             <span class="text-muted">No image</span>
                         @endif

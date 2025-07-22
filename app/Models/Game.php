@@ -25,6 +25,30 @@ class Game extends Model
         'is_deleted' => 'boolean',
     ];
 
+    /**
+     * Get the full URL for the game image
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        
+        // Return default game image if no image is set
+        return asset('images/default-game.png');
+    }
+
+    /**
+     * Get the storage path for the image
+     */
+    public function getImageStoragePathAttribute()
+    {
+        if ($this->image_path) {
+            return storage_path('app/public/' . $this->image_path);
+        }
+        return null;
+    }
+
     // Relationship to events
     public function events()
     {

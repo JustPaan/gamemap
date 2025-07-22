@@ -44,6 +44,15 @@ return [
             'throw' => false,
         ],
 
+        // Dedicated disk for game images
+        'game_images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/game_images'),
+            'url' => env('APP_URL').'/storage/game_images',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
