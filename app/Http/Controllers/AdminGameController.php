@@ -173,6 +173,12 @@ class AdminGameController extends Controller
         // Generate unique filename
         $filename = time() . '_' . $image->getClientOriginalName();
         
+        // Ensure the storage directory exists
+        $storageDir = storage_path('app/public/game_images');
+        if (!file_exists($storageDir)) {
+            mkdir($storageDir, 0755, true);
+        }
+        
         // Store to storage/app/public/game_images/ (Laravel standard)
         $storagePath = $image->storeAs('game_images', $filename, 'public');
         

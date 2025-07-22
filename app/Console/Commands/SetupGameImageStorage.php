@@ -15,23 +15,20 @@ class SetupGameImageStorage extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Setup game image storage directories and symlinks';
+    protected $description = 'Setup game image storage directories for Digital Ocean';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('Setting up GameMap image storage...');
+        $this->info('Setting up GameMap image storage for Digital Ocean...');
 
-        // Create storage directories
+        // Create Laravel storage directories
         $directories = [
+            storage_path('app'),
             storage_path('app/public'),
             storage_path('app/public/game_images'),
-            storage_path('app/public/avatars'),
-            public_path('storage'),
-            public_path('storage/game_images'),
-            public_path('storage/avatars'),
         ];
 
         foreach ($directories as $dir) {
@@ -43,18 +40,23 @@ class SetupGameImageStorage extends Command
             }
         }
 
-        // Create storage symlink
-        $this->call('storage:link');
-
         // Set proper permissions
         chmod(storage_path('app/public'), 0755);
         chmod(storage_path('app/public/game_images'), 0755);
-        chmod(public_path('storage'), 0755);
-        chmod(public_path('storage/game_images'), 0755);
+
+        // Create a test image to verify storage works
+        $testImageData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77yQAAAABJRU5ErkJggg==');
+        $testImagePath = storage_path('app/public/game_images/storage-test.png');
+        
+        if (file_put_contents($testImagePath, $testImageData)) {
+            $this->info("✅ Test image created successfully!");
+        } else {
+            $this->error("❌ Failed to create test image");
+        }
 
         $this->info('✅ Storage setup completed!');
         $this->info('Game images will be stored in: storage/app/public/game_images/');
-        $this->info('Public access via: public/storage/game_images/');
+        $this->info('Images accessible via Laravel route: /storage/game_images/{filename}');
 
         return 0;
     }
