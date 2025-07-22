@@ -32,8 +32,9 @@ class Game extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image_path) {
-            // Use Laravel asset helper with storage path
-            return asset('storage/' . $this->image_path);
+            // Use route() helper to generate the URL via our custom route
+            $filename = basename($this->image_path);
+            return route('game.image', ['filename' => $filename]);
         }
         
         // Return default game image if no image is set
