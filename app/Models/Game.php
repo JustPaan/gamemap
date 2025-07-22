@@ -32,9 +32,9 @@ class Game extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image_path) {
-            // Use route() helper to generate the URL via our custom route
+            // Use direct image server for Digital Ocean compatibility
             $filename = basename($this->image_path);
-            return route('game.image', ['filename' => $filename]);
+            return url('/serve_image.php?f=' . $filename);
         }
         
         // Return default game image if no image is set

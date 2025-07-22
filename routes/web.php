@@ -34,7 +34,11 @@ Route::get('/storage/game_images/{filename}', function ($filename) {
         abort(404);
     }
     
-    return response()->file($path);
+    $mimeType = mime_content_type($path);
+    return response()->file($path, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
 })->name('game.image');
 
 // Authentication Routes

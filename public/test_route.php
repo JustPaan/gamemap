@@ -1,60 +1,42 @@
 <?php
-// Simple test file to verify image serving
-echo "<h2>Image Route Test - Enhanced</h2>";
+// Test direct image server for Digital Ocean
+echo "<h2>Direct Image Server Test</h2>";
 
-// Check storage directory first
+// Check storage directory
 $storageDir = __DIR__ . '/../storage/app/public/game_images';
 echo "<p><strong>Storage directory:</strong> $storageDir</p>";
 echo "<p><strong>Directory exists:</strong> " . (is_dir($storageDir) ? "YES" : "NO") . "</p>";
 
-// Create directory if missing
-if (!is_dir($storageDir)) {
-    if (mkdir($storageDir, 0755, true)) {
-        echo "<p>✅ Directory created!</p>";
-    } else {
-        echo "<p>❌ Failed to create directory</p>";
-    }
-}
-
-// Check if test image exists, create if not
+// Create test image if missing
 $testImagePath = $storageDir . '/test-image.png';
-echo "<p><strong>Test image exists:</strong> " . (file_exists($testImagePath) ? "YES" : "NO") . "</p>";
-
 if (!file_exists($testImagePath)) {
     echo "<p>Creating test image...</p>";
     $testImageData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77yQAAAABJRU5ErkJggg==');
     if (file_put_contents($testImagePath, $testImageData)) {
         echo "<p>✅ Test image created!</p>";
-    } else {
-        echo "<p>❌ Failed to create test image</p>";
     }
 }
 
-// Test the route
-echo "<h3>Testing Image Route:</h3>";
-echo "<p>Route URL: <a href='/storage/game_images/test-image.png'>/storage/game_images/test-image.png</a></p>";
+// Test direct image server
+echo "<h3>Testing Direct Image Server:</h3>";
+echo "<p>Direct server URL: <a href='/serve_image.php?f=test-image.png' target='_blank'>/serve_image.php?f=test-image.png</a></p>";
 
-if (file_exists($testImagePath)) {
-    echo "<p>Image should display below:</p>";
-    echo "<img src='/storage/game_images/test-image.png' style='border: 2px solid red; width: 100px; height: 100px; background: white;'>";
-} else {
-    echo "<p>❌ Cannot test route - image file missing</p>";
-}
+echo "<p>Image should display below via direct server:</p>";
+echo "<img src='/serve_image.php?f=test-image.png' style='border: 2px solid green; width: 100px; height: 100px; background: white;'>";
 
-// List all files in directory
+// List all files with direct server links
 if (is_dir($storageDir)) {
     $files = scandir($storageDir);
-    echo "<h3>All files in storage:</h3><ul>";
+    echo "<h3>All files (via direct server):</h3><ul>";
     foreach ($files as $file) {
-        if ($file != '.' && $file != '..') {
-            echo "<li>$file - <a href='/storage/game_images/$file' target='_blank'>View</a></li>";
+        if ($file != '.' && $file != '..' && $file != '.gitkeep') {
+            echo "<li>$file - <a href='/serve_image.php?f=$file' target='_blank'>View Direct</a></li>";
         }
     }
     echo "</ul>";
-} else {
-    echo "<p>❌ Storage directory doesn't exist</p>";
 }
 
 echo "<hr>";
+echo "<p><strong>If image displays above, the system is working!</strong></p>";
 echo "<p><a href='/admin/game2'>Go back to Admin</a></p>";
 ?>
