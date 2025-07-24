@@ -251,15 +251,30 @@
     <!-- New Releases Section -->
     <div class="game-section">
         <h3>New Releases</h3>
+        
+        <!-- Debug Information -->
+        <div style="background: #333; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: left; font-size: 12px;">
+            <strong>DEBUG - Total Games:</strong> {{ count($newReleases) }}<br>
+            @foreach($newReleases->take(3) as $index => $game)
+                <strong>Game {{ $index + 1 }}:</strong> {{ $game->name }}<br>
+                <strong>Image Path:</strong> {{ $game->image_path ?? 'NULL' }}<br>
+                <strong>Basename:</strong> {{ $game->image_path ? basename($game->image_path) : 'NULL' }}<br>
+                <strong>Full URL:</strong> {{ $game->image_path ? url('serve_image.php') . '?file=' . basename($game->image_path) : 'NULL' }}<br>
+                <strong>Direct Test:</strong> <a href="{{ $game->image_path ? url('serve_image.php') . '?file=' . basename($game->image_path) : '#' }}" target="_blank" style="color: #4CAF50;">Test Image Link</a><br><br>
+            @endforeach
+        </div>
+        
         <div class="games-grid" id="newReleasesContainer">
             @foreach($newReleases as $game)
                 <div class="game" data-category="{{ strtolower($game->device_type) }}">
                     @if($game->image_path)
                         <img src="{{ url('serve_image.php') }}?file={{ basename($game->image_path) }}" 
-                             alt="{{ $game->name }}">
+                             alt="{{ $game->name }}"
+                             style="border: 2px solid green;">
                     @else
                         <img src="{{ asset('images/default-game.png') }}" 
-                             alt="{{ $game->name }}">
+                             alt="{{ $game->name }}"
+                             style="border: 2px solid yellow;">
                     @endif
                     <div>{{ $game->name }}</div>
                 </div>
