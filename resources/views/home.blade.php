@@ -255,7 +255,7 @@
             @foreach($newReleases as $game)
                 <div class="game" data-category="{{ strtolower($game->device_type) }}">
                     @if($game->image_path)
-                        <img src="{{ asset('storage/' . $game->image_path) }}" 
+                        <img src="{{ url('serve_image.php') }}?file={{ basename($game->image_path) }}" 
                              alt="{{ $game->name }}">
                     @else
                         <img src="{{ asset('images/default-game.png') }}" 
@@ -493,7 +493,7 @@
             const infoContent = `
                 <div class="event-info-window">
                     ${event.image_path ? 
-                        `<img src="/storage/${event.image_path}" alt="${event.title}">` : 
+                        `<img src="/serve_image.php?file=${event.image_path.split('/').pop()}" alt="${event.title}">` : 
                         `<img src="/images/default-event.jpg" alt="Default Event Image">`}
                     <h5>${event.title}</h5>
                     <p><strong>Game:</strong> ${event.game?.name || 'No game specified'}</p>
