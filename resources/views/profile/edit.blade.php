@@ -318,11 +318,18 @@
         <div class="form-group" style="text-align: center;">
             <label class="form-label">Profile Picture</label>
             <div class="avatar-container" style="margin: 0 auto; cursor: pointer; display: inline-block;">
-                <img id="avatar-preview" class="avatar-preview" alt="Avatar Preview" src="path/to/default/avatar.png" style="display: none; width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color);">
-                <div class="avatar-placeholder" onclick="document.getElementById('avatar-upload').click()" style="width: 60px; height: 60px; border-radius: 50%; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; border: 2px solid var(--border-color);">
-                    <span class="placeholder-icon" style="font-size: 30px; color: var(--text-secondary);">👤</span>
-                </div>
-                <input type="file" name="avatar" accept="image/*" class="file-input" id="avatar-upload" required style="display: none;">
+                @if($user->avatar)
+                    <img id="avatar-preview" class="avatar-preview" alt="Avatar Preview" src="{{ $user->avatar_url }}" onclick="document.getElementById('avatar-upload').click()" style="display: block; width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;">
+                    <div class="avatar-placeholder" onclick="document.getElementById('avatar-upload').click()" style="width: 60px; height: 60px; border-radius: 50%; background-color: #e0e0e0; display: none; justify-content: center; align-items: center; border: 2px solid var(--border-color);">
+                        <span class="placeholder-icon" style="font-size: 30px; color: var(--text-secondary);">👤</span>
+                    </div>
+                @else
+                    <img id="avatar-preview" class="avatar-preview" alt="Avatar Preview" src="path/to/default/avatar.png" onclick="document.getElementById('avatar-upload').click()" style="display: none; width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;">
+                    <div class="avatar-placeholder" onclick="document.getElementById('avatar-upload').click()" style="width: 60px; height: 60px; border-radius: 50%; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; border: 2px solid var(--border-color);">
+                        <span class="placeholder-icon" style="font-size: 30px; color: var(--text-secondary);">👤</span>
+                    </div>
+                @endif
+                <input type="file" name="avatar" accept="image/*" class="file-input" id="avatar-upload" style="display: none;">
             </div>
             <p class="text-secondary" style="text-align: center;">Click on the image to change your profile picture</p>
         </div>
@@ -408,8 +415,15 @@
 
                 reader.readAsDataURL(file);
             } else {
-                preview.style.display = 'none';
-                placeholder.style.display = 'flex';
+                // If no file selected, show existing avatar or placeholder
+                const hasExistingAvatar = preview.src && !preview.src.includes('path/to/default/avatar.png');
+                if (hasExistingAvatar) {
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                } else {
+                    preview.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                }
             }
         });
     });

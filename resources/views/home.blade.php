@@ -225,7 +225,7 @@
 
     <!-- User Profile Section -->
     <div class="profile-card">
-        <img src="{{ Auth::check() && Auth::user()->avatar ? asset('storage/avatar_images/' . Auth::user()->avatar) : asset('images/default-avatar.png') }}" 
+        <img src="{{ Auth::check() && Auth::user()->avatar ? Auth::user()->avatar_url : asset('images/default-avatar.png') }}" 
              alt="User Avatar" class="avatar">
         <div class="profile-info">
             <h3>{{ Auth::user()->name }}</h3>

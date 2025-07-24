@@ -73,17 +73,16 @@ class ProfileController extends Controller
             $avatar = $request->file('avatar');
             $filename = $avatar->hashName(); // Generate a unique filename
             
-            // Store the file
-            $path = $avatar->storeAs('avatar_images', $filename, 'public');
+            // Store the file in the correct directory for serve_avatar.php
+            $path = $avatar->storeAs('avatars', $filename, 'public');
             
             // Delete old avatar if it exists
             if ($user->avatar) {
-                Storage::disk('public')->delete('avatar_images/' . $user->avatar);
+                Storage::disk('public')->delete('avatars/' . $user->avatar);
             }
             
-            // Update both avatar (filename) and avatar_url (full path)
+            // Only store the filename - the avatar_url accessor handles the full URL
             $updateData['avatar'] = $filename;
-            $updateData['avatar_url'] = Storage::url($path);
         }
 
         // Update user data
