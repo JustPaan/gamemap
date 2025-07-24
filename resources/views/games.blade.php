@@ -278,7 +278,7 @@
                         </div>
                         <div class="game-card-body">
                             @if($game->image_path)
-                                <img src="{{ asset('storage/' . $game->image_path) }}" alt="Game Image" class="game-image">
+                                <img src="{{ $game->image_url }}" alt="Game Image" class="game-image">
                             @else
                                 <div class="game-image bg-secondary d-flex align-items-center justify-content-center">
                                     <i class="fas fa-gamepad fa-3x text-light"></i>
