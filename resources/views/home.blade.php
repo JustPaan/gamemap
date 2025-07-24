@@ -259,8 +259,9 @@
                 <strong>Game {{ $index + 1 }}:</strong> {{ $game->name }}<br>
                 <strong>Image Path:</strong> {{ $game->image_path ?? 'NULL' }}<br>
                 <strong>Basename:</strong> {{ $game->image_path ? basename($game->image_path) : 'NULL' }}<br>
-                <strong>Full URL:</strong> {{ $game->image_path ? url('serve_image.php') . '?file=' . basename($game->image_path) : 'NULL' }}<br>
-                <strong>Direct Test:</strong> <a href="{{ $game->image_path ? url('serve_image.php') . '?file=' . basename($game->image_path) : '#' }}" target="_blank" style="color: #4CAF50;">Test Image Link</a><br><br>
+                <strong>Admin Method (image_url):</strong> {{ $game->image_url }}<br>
+                <strong>Old Manual URL:</strong> {{ $game->image_path ? url('serve_image.php') . '?file=' . basename($game->image_path) : 'NULL' }}<br>
+                <strong>Direct Test:</strong> <a href="{{ $game->image_url }}" target="_blank" style="color: #4CAF50;">Test Image Link</a><br><br>
             @endforeach
         </div>
         
@@ -268,7 +269,7 @@
             @foreach($newReleases as $game)
                 <div class="game" data-category="{{ strtolower($game->device_type) }}">
                     @if($game->image_path)
-                        <img src="{{ url('serve_image.php') }}?file={{ basename($game->image_path) }}" 
+                        <img src="{{ $game->image_url }}" 
                              alt="{{ $game->name }}"
                              style="border: 2px solid green;">
                     @else
