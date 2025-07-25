@@ -1,7 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="en"                <!-- Left: Profile Picture -->
+                <div class="space-y-4">
+                    <div class="bg-gray-200 h-48 flex items-center justify-center rounded overflow-hidden cursor-pointer" onclick="document.getElementById('profile-upload').click()">
+                        @if($organizer->avatar)
+                            <img id="profile-preview" src="{{ $organizer->avatar_url }}" alt="Profile Picture" class="w-full h-full object-cover">
+                            <span id="upload-text" class="text-gray-600 hidden absolute">Click to change profile picture</span>
+                        @else
+                            <span id="upload-text" class="text-gray-600">Click to upload profile picture</span>
+                            <img id="profile-preview" src="" alt="" class="w-full h-full object-cover hidden">
+                        @endif
+                    </div>
+                    <input type="file" name="avatar" id="profile-upload" class="hidden" accept="image/*">
+                    <p class="text-sm text-gray-500 text-center">Click on the image area above to upload/change your profile picture</p>
+                </div>  <meta charset="UTF-8">
     <title>Organizer Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
@@ -90,14 +101,27 @@
         // Profile picture preview
         document.getElementById('profile-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
+            const preview = document.getElementById('profile-preview');
+            const uploadText = document.getElementById('upload-text');
+            
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('profile-preview').src = e.target.result;
-                    document.getElementById('profile-preview').classList.remove('hidden');
-                    document.getElementById('upload-text').style.display = 'none';
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    uploadText.classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
+            } else {
+                // If no file selected, show existing avatar or upload text
+                const hasExistingAvatar = preview.src && preview.src !== '';
+                if (hasExistingAvatar) {
+                    preview.classList.remove('hidden');
+                    uploadText.classList.add('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                    uploadText.classList.remove('hidden');
+                }
             }
         });
 

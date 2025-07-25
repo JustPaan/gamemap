@@ -59,26 +59,18 @@ public function update(Request $request)
     // Handle avatar upload
     if ($request->hasFile('avatar')) {
         $avatar = $request->file('avatar');
-        $filename = 'avatar_'.$userId.'_'.time().'.'.$avatar->getClientOriginalExtension();
+        $filename = $avatar->hashName(); // Generate a unique filename
         
-        // Ensure the avatars directory exists
-        $avatarsDir = storage_path('app/public/avatars');
-        if (!file_exists($avatarsDir)) {
-            mkdir($avatarsDir, 0755, true);
-        }
-        
-        // Store the file
+        // Store the file in the correct directory for serve_avatar.php
         $path = $avatar->storeAs('avatars', $filename, 'public');
         
         // Delete old avatar if it exists
         if ($user->avatar) {
-            $oldAvatarPath = storage_path('app/public/' . $user->avatar);
-            if (file_exists($oldAvatarPath)) {
-                unlink($oldAvatarPath);
-            }
+            Storage::disk('public')->delete('avatars/' . $user->avatar);
         }
         
-        $updateData['avatar'] = $path;
+        // Only store the filename - the avatar_url accessor handles the full URL
+        $updateData['avatar'] = $filename;
     }
 
     // Update user data
