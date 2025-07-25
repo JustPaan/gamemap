@@ -492,7 +492,6 @@
             });
 
             const infoContent = `
-                            const infoContent = `
                 <div class="event-info-window">
                     <img src="${event.image_url || '/images/default-event.jpg'}" 
                          alt="${event.title}" 
@@ -503,7 +502,6 @@
                     <p><strong>Where:</strong> ${event.location_name || 'No location specified'}</p>
                     <a href="/events/${event.id}" class="btn btn-primary btn-sm mt-2">View Details</a>
                 </div>
-            `;
             `;
             
             const infowindow = new google.maps.InfoWindow({
