@@ -101,7 +101,7 @@
     <h2 class="text-center">User Profile</h2>
     
     <div class="text-center">
-        <img src="{{ Auth::check() && Auth::user()->avatar ? asset('storage/avatar_images/' . Auth::user()->avatar) : asset('images/default-avatar.png') }}" 
+        <img src="{{ Auth::check() && Auth::user()->avatar ? Auth::user()->avatar_url : asset('images/default-avatar.png') }}" 
         alt="User Avatar" class="avatar">
     </div>
 
