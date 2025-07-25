@@ -84,8 +84,15 @@
 
                     <div class="mb-3">
                         <label for="event_image" class="form-label">Event Image</label>
-                        <input type="file" class="form-control" id="event_image" name="event_image" accept="image/*">
-                        <small class="text-muted">Recommended size: 1200x630 pixels</small>
+                        <input type="file" class="form-control" id="event_image" name="event_image" 
+                               accept="image/jpeg,image/jpg,image/png,image/gif" 
+                               onchange="validateImageFile(this)">
+                        <small class="text-muted">Recommended size: 1200x630 pixels. Accepted formats: JPG, PNG, GIF (Max: 2MB)</small>
+                        <div id="imagePreview" style="margin-top: 10px; display: none;">
+                            <img id="previewImg" src="" style="max-width: 200px; max-height: 150px; border-radius: 5px; border: 1px solid #ddd;">
+                            <p id="fileInfo" style="margin-top: 5px; font-size: 12px; color: #666;"></p>
+                        </div>
+                        <div id="imageError" style="color: red; font-size: 12px; margin-top: 5px; display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -336,6 +343,61 @@
                 }
             }
         });
+    }
+
+    // Image file validation and preview
+    function validateImageFile(input) {
+        const file = input.files[0];
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const fileInfo = document.getElementById('fileInfo');
+        const errorDiv = document.getElementById('imageError');
+        
+        // Reset displays
+        imagePreview.style.display = 'none';
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+        
+        if (!file) {
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            errorDiv.textContent = 'Please select a valid image file (JPG, PNG, GIF only)';
+            errorDiv.style.display = 'block';
+            input.value = '';
+            return;
+        }
+        
+        // Validate file size (2MB max)
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        if (file.size > maxSize) {
+            errorDiv.textContent = 'File size must be less than 2MB';
+            errorDiv.style.display = 'block';
+            input.value = '';
+            return;
+        }
+        
+        // Validate filename (no special characters that could cause issues)
+        const filename = file.name;
+        const validFilename = /^[a-zA-Z0-9_\-\s\.]+$/;
+        if (!validFilename.test(filename)) {
+            errorDiv.textContent = 'Filename contains invalid characters. Please rename your file using only letters, numbers, spaces, hyphens, and underscores.';
+            errorDiv.style.display = 'block';
+            input.value = '';
+            return;
+        }
+        
+        // Display preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            fileInfo.textContent = `File: ${filename} (${(file.size / 1024).toFixed(1)} KB)`;
+            imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
     }
 </script>
 </body>

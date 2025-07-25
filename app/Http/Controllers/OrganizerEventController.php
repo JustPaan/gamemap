@@ -130,8 +130,29 @@ public function index()
 
         // Handle file upload
         if ($request->hasFile('event_image')) {
-            $path = $request->file('event_image')->store('event_images', 'public');
+            $file = $request->file('event_image');
+            
+            // Generate a clean, safe filename
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            
+            // Clean the original name (remove special characters)
+            $cleanName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $originalName);
+            $cleanName = substr($cleanName, 0, 50); // Limit length
+            
+            // Generate unique filename
+            $filename = $cleanName . '_' . time() . '_' . uniqid() . '.' . strtolower($extension);
+            
+            // Store with clean filename
+            $path = $file->storeAs('event_images', $filename, 'public');
             $event->update(['image_path' => $path]);
+            
+            Log::info('Event image uploaded', [
+                'event_id' => $event->id,
+                'original_name' => $file->getClientOriginalName(),
+                'stored_path' => $path,
+                'file_size' => $file->getSize()
+            ]);
         }
 
         return redirect()->route('organizer.event')->with('success', 'Event created successfully!');
