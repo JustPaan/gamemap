@@ -176,9 +176,9 @@ public function getIsOngoingAttribute(): bool
     public function getImageUrlAttribute(): string
     {
         if ($this->image_path) {
-            // Use direct image server for Digital Ocean compatibility
+            // Use direct event image server for Digital Ocean compatibility
             $filename = basename($this->image_path);
-            return url('/serve_image.php?f=' . $filename);
+            return url('/serve_event_image.php?f=' . $filename);
         }
         
         return asset('images/default-event.jpg');

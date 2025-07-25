@@ -18,8 +18,20 @@ $eventImagesDir = __DIR__ . '/../storage/app/public/event_images/';
 echo "<div class='info'>";
 echo "<strong>Directory Status:</strong><br>";
 echo "• game_images: " . (is_dir($gameImagesDir) ? "✅ EXISTS" : "❌ MISSING") . "<br>";
-echo "• event_images: " . (is_dir($eventImagesDir) ? "✅ EXISTS" : "❌ MISSING") . "<br>";
+echo "• event_images: " . (is_dir($eventImagesDir) ? "✅ EXISTS (legacy)" : "⚠️ MISSING (not needed with current config)") . "<br>";
 echo "</div><br>";
+
+// Create missing directories if needed
+if (!is_dir($gameImagesDir)) {
+    if (mkdir($gameImagesDir, 0755, true)) {
+        echo "<div class='success'>✅ Created game_images directory</div>";
+    }
+}
+if (!is_dir($eventImagesDir)) {
+    if (mkdir($eventImagesDir, 0755, true)) {
+        echo "<div class='success'>✅ Created event_images directory (for compatibility)</div>";
+    }
+}
 
 // Check controller
 $controllerPath = __DIR__ . '/../app/Http/Controllers/OrganizerEventController.php';
