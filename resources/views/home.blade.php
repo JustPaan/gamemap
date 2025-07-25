@@ -493,9 +493,9 @@
 
             const infoContent = `
                 <div class="event-info-window">
-                    ${event.image_path ? 
-                        `<img src="/serve_image.php?file=${event.image_path.split('/').pop()}" alt="${event.title}">` : 
-                        `<img src="/images/default-event.jpg" alt="Default Event Image">`}
+                    <img src="${event.image_url || '/images/default-event.jpg'}" 
+                         alt="${event.title}" 
+                         onerror="this.src='/images/default-event.jpg'">
                     <h5>${event.title}</h5>
                     <p><strong>Game:</strong> ${event.game?.name || 'No game specified'}</p>
                     <p><strong>When:</strong> ${new Date(event.start_date).toLocaleString()}</p>
