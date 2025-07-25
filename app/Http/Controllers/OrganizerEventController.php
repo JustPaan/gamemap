@@ -130,7 +130,7 @@ public function index()
 
         // Handle file upload
         if ($request->hasFile('event_image')) {
-            $path = $request->file('event_image')->store('event_images', 'public');
+            $path = $request->file('event_image')->store('game_images', 'public');
             $event->update(['image_path' => $path]);
         }
 
@@ -211,7 +211,7 @@ public function index()
                 Storage::disk('public')->delete($event->image_path);
             }
             
-            $path = $request->file('event_image')->store('event_images', 'public');
+            $path = $request->file('event_image')->store('game_images', 'public');
             $event->update(['image_path' => $path]);
         }
 
