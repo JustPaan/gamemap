@@ -230,7 +230,7 @@
 
                             <!-- Image Display -->
                             @if($event->image_path)
-                                <img src="{{ asset('storage/' . $event->image_path) }}" alt="Event Image" class="img-fluid mb-3" style="max-height: 150px;">
+                                <img src="{{ $event->image_url }}" alt="Event Image" class="img-fluid mb-3" style="max-height: 150px;">
                             @else
                                 <p>No image available</p>
                             @endif

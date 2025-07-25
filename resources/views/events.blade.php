@@ -151,7 +151,7 @@
                             <p><i class="fas fa-users"></i> Max Participants: {{ $event->max_participants }}</p>
 
                             @if($event->image_path)
-                                <img src="{{ asset('storage/' . $event->image_path) }}" alt="Event Image" class="img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                <img src="{{ $event->image_url }}" alt="Event Image" class="img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                             @endif
 
                             <div class="mt-3">

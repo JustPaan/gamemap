@@ -36,7 +36,7 @@
     <h2 class="mb-4">{{ $event->title }}</h2>
 
     @if($event->image_path)
-        <img src="{{ asset('storage/' . $event->image_path) }}" alt="Event Image" class="event-image">
+        <img src="{{ $event->image_url }}" alt="Event Image" class="event-image">
     @else
         <p>No image available.</p>
     @endif

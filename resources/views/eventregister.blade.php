@@ -206,7 +206,7 @@
                     </p>
 
                     @if($event->image_path)
-                        <img src="{{ asset('storage/' . $event->image_path) }}" alt="Event Image" class="img-fluid mb-3" style="width: 100%; height: 150px; object-fit: cover;">
+                        <img src="{{ $event->image_url }}" alt="Event Image" class="img-fluid mb-3" style="width: 100%; height: 150px; object-fit: cover;">
                     @endif
 
                     <div class="d-flex justify-content-between mt-3">

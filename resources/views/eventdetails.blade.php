@@ -41,7 +41,7 @@
             <p><strong>Max Participants:</strong> {{ $event->max_participants }}</p>
             
             @if($event->image_path)
-                <img src="{{ asset('storage/' . $event->image_path) }}" alt="Event Image" class="img-fluid mb-3" style="width: 300px; height: auto; object-fit: cover;">
+                <img src="{{ $event->image_url }}" alt="Event Image" class="img-fluid mb-3" style="width: 300px; height: auto; object-fit: cover;">
             @endif
         </div>
     </div>

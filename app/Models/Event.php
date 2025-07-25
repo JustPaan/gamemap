@@ -50,7 +50,8 @@ class Event extends Model
         'is_ongoing',
         'participant_count',
         'formatted_total_fee',
-        'location' // Add this to append the location array
+        'location', // Add this to append the location array
+        'image_url'
     ];
 
     protected $primaryKey = 'id';
@@ -170,6 +171,17 @@ public function getIsOngoingAttribute(): bool
     public function getFormattedTotalFeeAttribute(): string
     {
         return 'RM ' . number_format($this->total_fee, 2);
+    }
+
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->image_path) {
+            // Use direct image server for Digital Ocean compatibility
+            $filename = basename($this->image_path);
+            return url('/serve_image.php?f=' . $filename);
+        }
+        
+        return asset('images/default-event.jpg');
     }
 
     // Method to get the pin point coordinates
