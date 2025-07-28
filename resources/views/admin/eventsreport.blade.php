@@ -92,7 +92,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEMprsBfBuikdHEQgss2K0bpau0dthecY&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBoWvvejR7S5GT8Bh7mfaygm0HKp5Q_jlU&callback=initMap" async defer></script>
 <script>
     function initMap() {
         const container = document.getElementById('map');

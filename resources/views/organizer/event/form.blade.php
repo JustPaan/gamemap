@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Event</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEMprsBfBuikdHEQgss2K0bpau0dthecY&libraries=places&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBoWvvejR7S5GT8Bh7mfaygm0HKp5Q_jlU&libraries=places&callback=initMap" async defer></script>
     <style>
         #map {
             height: 400px;
@@ -326,7 +326,6 @@
     }
 
     function updateLocationFields(location, name = null) {
-        console.log('Updating location to:', location.lat(), location.lng());
         document.getElementById('location_lat').value = location.lat();
         document.getElementById('location_lng').value = location.lng();
         
