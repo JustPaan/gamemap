@@ -167,11 +167,23 @@
             background-color: #3a3a3f;
             border-color: #4a4a4f;
             color: var(--primary);
+            min-height: 40px;
         }
 
         .pagination .page-item.active .page-link {
             background-color: var(--primary);
             border-color: var(--primary);
+        }
+
+        /* Perfect arrow alignment for pagination */
+        .pagination .page-link i {
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        .pagination .page-link.d-flex {
+            min-width: 40px;
+            min-height: 40px;
         }
 
         @media (max-width: 768px) {
