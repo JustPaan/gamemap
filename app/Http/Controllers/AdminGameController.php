@@ -129,6 +129,14 @@ class AdminGameController extends Controller
     public function destroy(Game $game)
     {
         try {
+            // Check if there are any events associated with this game
+            $eventCount = \App\Models\Event::where('game_id', $game->id)->count();
+            
+            if ($eventCount > 0) {
+                return redirect()->route('admin.game2')
+                    ->with('error', "Cannot delete game '{$game->name}' because it has {$eventCount} associated event(s). Please delete or reassign those events first.");
+            }
+            
             // Delete the associated image if exists
             $this->deleteImage($game->image_path);
             
@@ -211,6 +219,14 @@ class AdminGameController extends Controller
     {
         try {
             $game = Game::withTrashed()->findOrFail($id);
+            
+            // Check if there are any events associated with this game
+            $eventCount = \App\Models\Event::where('game_id', $game->id)->count();
+            
+            if ($eventCount > 0) {
+                return redirect()->route('admin.game2')
+                    ->with('error', "Cannot delete game '{$game->name}' because it has {$eventCount} associated event(s). Please delete or reassign those events first.");
+            }
             
             // Delete the associated image if exists
             $this->deleteImage($game->image_path);
