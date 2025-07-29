@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -130,7 +131,7 @@ class AdminGameController extends Controller
     {
         try {
             // Check if there are any events associated with this game
-            $eventCount = \App\Models\Event::where('game_id', $game->id)->count();
+            $eventCount = Event::where('game_id', $game->id)->count();
             
             if ($eventCount > 0) {
                 return redirect()->route('admin.game2')
@@ -221,7 +222,7 @@ class AdminGameController extends Controller
             $game = Game::withTrashed()->findOrFail($id);
             
             // Check if there are any events associated with this game
-            $eventCount = \App\Models\Event::where('game_id', $game->id)->count();
+            $eventCount = Event::where('game_id', $game->id)->count();
             
             if ($eventCount > 0) {
                 return redirect()->route('admin.game2')
