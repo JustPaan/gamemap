@@ -17,10 +17,10 @@ class HomeController extends Controller
      */
 public function index()
 {
-    // Get the newest non-deleted games (11 most recent)
+    // Get the newest non-deleted games (10 most recent)
     $newReleases = Game::where('is_deleted', false)
                     ->orderBy('created_at', 'desc')
-                    ->take(11)
+                    ->take(10)
                     ->get();
 
     // Get all upcoming or ongoing events
