@@ -227,8 +227,9 @@
     <div class="profile-card">
         <!-- DEBUG INFO (TEMPORARY) -->
         @if(config('app.debug'))
-        <div style="position: absolute; top: 0; left: 0; background: rgba(255,0,0,0.8); color: white; padding: 5px; font-size: 10px; z-index: 1000;">
+        <div style="position: absolute; top: 0; left: 0; background: rgba(255,0,0,0.8); color: white; padding: 5px; font-size: 10px; z-index: 1000; width: 100%; word-wrap: break-word;">
             DEBUG: ID={{ Auth::user()->id }} | Avatar={{ Auth::user()->avatar ?? 'NULL' }} | URL={{ Auth::user()->avatar_url }}
+            <br>Debug URL: <a href="/debug-avatar" style="color: yellow;">/debug-avatar</a>
         </div>
         @endif
         
