@@ -244,7 +244,7 @@ Route::get('/admin/organizers/create', [AdminOrganizerController::class, 'create
     })->middleware(['auth', 'can:organizer-access'])->name('organizer.pending');
 });
 
-// TEMPORARY DEBUG ROUTE - Remove after fixing avatar issue
+// TEMPORARY DEBUG ROUTE - Check what's happening with avatar on refresh
 Route::get('/debug-avatar', function () {
     if (!auth()->check()) {
         return 'Not logged in';
@@ -252,62 +252,39 @@ Route::get('/debug-avatar', function () {
     
     $user = auth()->user();
     $output = '<div style="font-family: Arial; padding: 20px; background: #f5f5f5;">';
-    $output .= '<h2>Avatar Debug Information</h2>';
+    $output .= '<h2>Avatar Debug Information (Refresh Issue)</h2>';
     $output .= '<p><strong>User ID:</strong> ' . $user->id . '</p>';
     $output .= '<p><strong>Name:</strong> ' . $user->name . '</p>';
-    $output .= '<p><strong>Email:</strong> ' . $user->email . '</p>';
     $output .= '<p><strong>Avatar (DB):</strong> ' . ($user->avatar ?? 'NULL') . '</p>';
     $output .= '<p><strong>Avatar URL:</strong> ' . $user->avatar_url . '</p>';
-    $output .= '<p><strong>Created:</strong> ' . $user->created_at . '</p>';
-    $output .= '<p><strong>Updated:</strong> ' . $user->updated_at . '</p>';
+    $output .= '<p><strong>Current Time:</strong> ' . now() . '</p>';
     
     // Check if avatar file exists
     if ($user->avatar) {
         $filename = basename($user->avatar);
-        $filePath = storage_path('app/public/avatars/' . $filename);
-        $fileExists = file_exists($filePath) ? '✅ YES' : '❌ NO';
-        $output .= '<p><strong>Avatar File Exists:</strong> ' . $fileExists . '</p>';
-        $output .= '<p><strong>File Path:</strong> ' . $filePath . '</p>';
-        
-        // Check if this might be a game image filename
+        $avatarPath = storage_path('app/public/avatars/' . $filename);
         $gameImagePath = storage_path('app/public/game_images/' . $filename);
-        $isGameImage = file_exists($gameImagePath) ? '⚠️ YES - PROBLEM!' : '✅ NO';
-        $output .= '<p><strong>File exists in game_images directory:</strong> ' . $isGameImage . '</p>';
+        
+        $output .= '<h3>File Status:</h3>';
+        $output .= '<p><strong>Filename:</strong> ' . $filename . '</p>';
+        $output .= '<p><strong>Avatar Path:</strong> ' . $avatarPath . '</p>';
+        $output .= '<p><strong>Avatar Exists:</strong> ' . (file_exists($avatarPath) ? '✅ YES' : '❌ NO') . '</p>';
+        $output .= '<p><strong>Game Image Path:</strong> ' . $gameImagePath . '</p>';
+        $output .= '<p><strong>Game Image Exists:</strong> ' . (file_exists($gameImagePath) ? '⚠️ YES - PROBLEM!' : '✅ NO') . '</p>';
+        
+        // Check what serve_avatar.php would serve
+        $serveUrl = url('/serve_avatar.php?f=' . $filename);
+        $output .= '<p><strong>Serve Avatar URL:</strong> <a href="' . $serveUrl . '" target="_blank">' . $serveUrl . '</a></p>';
     }
     
-    // Check for duplicate users
+    $output .= '<h3>All Users with Same Email:</h3>';
     $duplicates = \App\Models\User::where('email', $user->email)->get();
-    $output .= '<h3>Users with same email:</h3>';
     foreach ($duplicates as $dup) {
         $output .= '<div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0;">';
-        $output .= '<p>ID: ' . $dup->id . ' | Name: ' . $dup->name . ' | Avatar: ' . ($dup->avatar ?? 'NULL') . ' | Created: ' . $dup->created_at . '</p>';
+        $output .= '<p><strong>ID:</strong> ' . $dup->id . ' | <strong>Name:</strong> ' . $dup->name . ' | <strong>Avatar:</strong> ' . ($dup->avatar ?? 'NULL') . ' | <strong>Created:</strong> ' . $dup->created_at . '</p>';
         $output .= '</div>';
-    }
-    
-    // Add fix button if avatar is pointing to game image
-    if ($user->avatar && file_exists(storage_path('app/public/game_images/' . basename($user->avatar)))) {
-        $output .= '<h3 style="color: red;">⚠️ AVATAR ISSUE DETECTED!</h3>';
-        $output .= '<p>Your avatar is pointing to a game image file. <a href="/fix-avatar" style="background: red; color: white; padding: 10px; text-decoration: none;">Click here to fix</a></p>';
     }
     
     $output .= '</div>';
     return $output;
-})->middleware('auth');
-
-// TEMPORARY FIX ROUTE - Remove after fixing avatar issue
-Route::get('/fix-avatar', function () {
-    if (!auth()->check()) {
-        return redirect('/login');
-    }
-    
-    $user = auth()->user();
-    
-    // Check if avatar is pointing to a game image
-    if ($user->avatar && file_exists(storage_path('app/public/game_images/' . basename($user->avatar)))) {
-        // Reset avatar to null so it uses default
-        \App\Models\User::where('id', $user->id)->update(['avatar' => null]);
-        return redirect('/debug-avatar')->with('message', 'Avatar reset to default. You can now upload a new profile picture.');
-    }
-    
-    return redirect('/debug-avatar')->with('message', 'No avatar issue detected.');
 })->middleware('auth');
