@@ -169,7 +169,15 @@ public function organizerProfile()
         if ($this->avatar) {
             // Use direct image server for Digital Ocean compatibility
             $filename = basename($this->avatar);
-            return url('/serve_avatar.php?f=' . $filename);
+            
+            // Check if file exists before serving
+            $filePath = storage_path('app/public/avatars/' . $filename);
+            if (file_exists($filePath)) {
+                return url('/serve_avatar.php?f=' . $filename);
+            }
+            
+            // If file doesn't exist, log it and fall back to default
+            \Illuminate\Support\Facades\Log::warning("Avatar file not found for user {$this->id}: {$filePath}");
         }
         
         return asset('images/default-avatar.png');

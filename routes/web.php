@@ -243,3 +243,42 @@ Route::get('/admin/organizers/create', [AdminOrganizerController::class, 'create
         return redirect()->route('home');
     })->middleware(['auth', 'can:organizer-access'])->name('organizer.pending');
 });
+
+// TEMPORARY DEBUG ROUTE - Remove after fixing avatar issue
+Route::get('/debug-avatar', function () {
+    if (!auth()->check()) {
+        return 'Not logged in';
+    }
+    
+    $user = auth()->user();
+    $output = '<div style="font-family: Arial; padding: 20px; background: #f5f5f5;">';
+    $output .= '<h2>Avatar Debug Information</h2>';
+    $output .= '<p><strong>User ID:</strong> ' . $user->id . '</p>';
+    $output .= '<p><strong>Name:</strong> ' . $user->name . '</p>';
+    $output .= '<p><strong>Email:</strong> ' . $user->email . '</p>';
+    $output .= '<p><strong>Avatar (DB):</strong> ' . ($user->avatar ?? 'NULL') . '</p>';
+    $output .= '<p><strong>Avatar URL:</strong> ' . $user->avatar_url . '</p>';
+    $output .= '<p><strong>Created:</strong> ' . $user->created_at . '</p>';
+    $output .= '<p><strong>Updated:</strong> ' . $user->updated_at . '</p>';
+    
+    // Check if avatar file exists
+    if ($user->avatar) {
+        $filename = basename($user->avatar);
+        $filePath = storage_path('app/public/avatars/' . $filename);
+        $fileExists = file_exists($filePath) ? '✅ YES' : '❌ NO';
+        $output .= '<p><strong>Avatar File Exists:</strong> ' . $fileExists . '</p>';
+        $output .= '<p><strong>File Path:</strong> ' . $filePath . '</p>';
+    }
+    
+    // Check for duplicate users
+    $duplicates = \App\Models\User::where('email', $user->email)->get();
+    $output .= '<h3>Users with same email:</h3>';
+    foreach ($duplicates as $dup) {
+        $output .= '<div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0;">';
+        $output .= '<p>ID: ' . $dup->id . ' | Name: ' . $dup->name . ' | Avatar: ' . ($dup->avatar ?? 'NULL') . ' | Created: ' . $dup->created_at . '</p>';
+        $output .= '</div>';
+    }
+    
+    $output .= '</div>';
+    return $output;
+})->middleware('auth');
