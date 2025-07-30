@@ -305,7 +305,7 @@ Route::get('/fix-avatar', function () {
     // Check if avatar is pointing to a game image
     if ($user->avatar && file_exists(storage_path('app/public/game_images/' . basename($user->avatar)))) {
         // Reset avatar to null so it uses default
-        $user->update(['avatar' => null]);
+        \App\Models\User::where('id', $user->id)->update(['avatar' => null]);
         return redirect('/debug-avatar')->with('message', 'Avatar reset to default. You can now upload a new profile picture.');
     }
     
