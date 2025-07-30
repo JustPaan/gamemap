@@ -235,7 +235,7 @@
         <img src="{{ Auth::check() && Auth::user()->avatar ? Auth::user()->avatar_url : asset('images/default-avatar.png') }}" 
              alt="User Avatar" class="avatar"
              onerror="console.log('Avatar failed to load:', this.src); this.src='{{ asset('images/default-avatar.png') }}';"
-             onload="console.log('Avatar loaded successfully:', this.src);">>
+             onload="console.log('Avatar loaded successfully:', this.src);">
         <div class="profile-info">
             <h3>{{ Auth::user()->name }}</h3>
             <p>Email: {{ Auth::user()->email }}</p>
