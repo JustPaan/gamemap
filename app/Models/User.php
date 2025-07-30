@@ -170,14 +170,22 @@ public function organizerProfile()
             // Use direct image server for Digital Ocean compatibility
             $filename = basename($this->avatar);
             
-            // Check if file exists before serving
-            $filePath = storage_path('app/public/avatars/' . $filename);
-            if (file_exists($filePath)) {
+            // Check if file exists in avatars directory
+            $avatarPath = storage_path('app/public/avatars/' . $filename);
+            if (file_exists($avatarPath)) {
                 return url('/serve_avatar.php?f=' . $filename);
             }
             
-            // If file doesn't exist, log it and fall back to default
-            \Illuminate\Support\Facades\Log::warning("Avatar file not found for user {$this->id}: {$filePath}");
+            // Check if avatar is mistakenly pointing to game image
+            $gameImagePath = storage_path('app/public/game_images/' . $filename);
+            if (file_exists($gameImagePath)) {
+                // Log this issue and fall back to default
+                \Illuminate\Support\Facades\Log::warning("User {$this->id} avatar points to game image: {$filename}");
+                return asset('images/default-avatar.png');
+            }
+            
+            // If file doesn't exist anywhere, log it and fall back to default
+            \Illuminate\Support\Facades\Log::warning("Avatar file not found for user {$this->id}: {$avatarPath}");
         }
         
         return asset('images/default-avatar.png');

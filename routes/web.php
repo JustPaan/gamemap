@@ -268,6 +268,11 @@ Route::get('/debug-avatar', function () {
         $fileExists = file_exists($filePath) ? '✅ YES' : '❌ NO';
         $output .= '<p><strong>Avatar File Exists:</strong> ' . $fileExists . '</p>';
         $output .= '<p><strong>File Path:</strong> ' . $filePath . '</p>';
+        
+        // Check if this might be a game image filename
+        $gameImagePath = storage_path('app/public/game_images/' . $filename);
+        $isGameImage = file_exists($gameImagePath) ? '⚠️ YES - PROBLEM!' : '✅ NO';
+        $output .= '<p><strong>File exists in game_images directory:</strong> ' . $isGameImage . '</p>';
     }
     
     // Check for duplicate users
@@ -279,6 +284,30 @@ Route::get('/debug-avatar', function () {
         $output .= '</div>';
     }
     
+    // Add fix button if avatar is pointing to game image
+    if ($user->avatar && file_exists(storage_path('app/public/game_images/' . basename($user->avatar)))) {
+        $output .= '<h3 style="color: red;">⚠️ AVATAR ISSUE DETECTED!</h3>';
+        $output .= '<p>Your avatar is pointing to a game image file. <a href="/fix-avatar" style="background: red; color: white; padding: 10px; text-decoration: none;">Click here to fix</a></p>';
+    }
+    
     $output .= '</div>';
     return $output;
+})->middleware('auth');
+
+// TEMPORARY FIX ROUTE - Remove after fixing avatar issue
+Route::get('/fix-avatar', function () {
+    if (!auth()->check()) {
+        return redirect('/login');
+    }
+    
+    $user = auth()->user();
+    
+    // Check if avatar is pointing to a game image
+    if ($user->avatar && file_exists(storage_path('app/public/game_images/' . basename($user->avatar)))) {
+        // Reset avatar to null so it uses default
+        $user->update(['avatar' => null]);
+        return redirect('/debug-avatar')->with('message', 'Avatar reset to default. You can now upload a new profile picture.');
+    }
+    
+    return redirect('/debug-avatar')->with('message', 'No avatar issue detected.');
 })->middleware('auth');
