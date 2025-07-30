@@ -288,6 +288,9 @@ Route::get('/debug-avatar', function () {
             $output .= '<p>Your database has an avatar filename but the file doesn\'t exist on the server.</p>';
             $output .= '<p><a href="/fix-missing-avatar" style="background: green; color: white; padding: 10px; text-decoration: none;">Reset Avatar to Allow New Upload</a></p>';
         }
+    } else {
+        $output .= '<h3>No Avatar Set (Database is NULL)</h3>';
+        $output .= '<p>This means you can upload a new avatar and it should work.</p>';
     }
     
     $output .= '<h3>Directory Contents:</h3>';
@@ -299,7 +302,16 @@ Route::get('/debug-avatar', function () {
         $output .= '<h4>Avatars Directory:</h4>';
         foreach ($avatarFiles as $file) {
             if ($file !== '.' && $file !== '..') {
-                $output .= '<p>• ' . $file . '</p>';
+                $filePath = $avatarDir . $file;
+                $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
+                $fileTime = file_exists($filePath) ? date('Y-m-d H:i:s', filemtime($filePath)) : 'Unknown';
+                $output .= '<p>• ' . $file . ' (' . $fileSize . ' bytes, modified: ' . $fileTime . ')</p>';
+                
+                // If this file exists but isn't in database, offer to fix it
+                if ($file !== 'gitkeep' && !$user->avatar) {
+                    $output .= '<p style="margin-left: 20px; color: orange;">⚠️ This file exists but isn\'t linked to your account!</p>';
+                    $output .= '<p style="margin-left: 20px;"><a href="/link-avatar/' . urlencode($file) . '" style="background: blue; color: white; padding: 5px; text-decoration: none;">Link This File</a></p>';
+                }
             }
         }
     }
@@ -338,4 +350,33 @@ Route::get('/fix-missing-avatar', function () {
     \App\Models\User::where('id', $user->id)->update(['avatar' => null]);
     
     return redirect('/debug-avatar')->with('message', 'Avatar reset! The database has been cleared. You can now upload a new profile picture and it will work properly.');
+})->middleware('auth');
+
+// TEMPORARY LINK ROUTE - Link existing avatar file to user account
+Route::get('/link-avatar/{filename}', function ($filename) {
+    if (!auth()->check()) {
+        return redirect('/login');
+    }
+    
+    $user = auth()->user();
+    $filename = urldecode($filename);
+    
+    // Security check - only allow certain file types
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    
+    if (!in_array($extension, $allowedExtensions)) {
+        return redirect('/debug-avatar')->with('message', 'Invalid file type.');
+    }
+    
+    // Check if file exists
+    $avatarPath = storage_path('app/public/avatars/' . $filename);
+    if (!file_exists($avatarPath)) {
+        return redirect('/debug-avatar')->with('message', 'File does not exist.');
+    }
+    
+    // Update user's avatar field
+    \App\Models\User::where('id', $user->id)->update(['avatar' => $filename]);
+    
+    return redirect('/debug-avatar')->with('message', 'Avatar linked successfully! Check your profile now.');
 })->middleware('auth');
