@@ -281,6 +281,13 @@ Route::get('/debug-avatar', function () {
             $output .= '<p><strong>Avatar File Size:</strong> ' . filesize($avatarPath) . ' bytes</p>';
             $output .= '<p><strong>Avatar Modified:</strong> ' . date('Y-m-d H:i:s', filemtime($avatarPath)) . '</p>';
         }
+        
+        // Add fix button if avatar file is missing
+        if (!file_exists($avatarPath)) {
+            $output .= '<h3 style="color: red;">⚠️ AVATAR FILE MISSING!</h3>';
+            $output .= '<p>Your database has an avatar filename but the file doesn\'t exist on the server.</p>';
+            $output .= '<p><a href="/fix-missing-avatar" style="background: green; color: white; padding: 10px; text-decoration: none;">Reset Avatar to Allow New Upload</a></p>';
+        }
     }
     
     $output .= '<h3>Directory Contents:</h3>';
@@ -317,4 +324,18 @@ Route::get('/debug-avatar', function () {
     
     $output .= '</div>';
     return $output;
+})->middleware('auth');
+
+// TEMPORARY FIX ROUTE - Fix missing avatar file issue
+Route::get('/fix-missing-avatar', function () {
+    if (!auth()->check()) {
+        return redirect('/login');
+    }
+    
+    $user = auth()->user();
+    
+    // Reset avatar to null so user can upload a new one
+    \App\Models\User::where('id', $user->id)->update(['avatar' => null]);
+    
+    return redirect('/debug-avatar')->with('message', 'Avatar reset! The database has been cleared. You can now upload a new profile picture and it will work properly.');
 })->middleware('auth');
