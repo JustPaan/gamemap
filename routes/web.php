@@ -275,6 +275,36 @@ Route::get('/debug-avatar', function () {
         // Check what serve_avatar.php would serve
         $serveUrl = url('/serve_avatar.php?f=' . $filename);
         $output .= '<p><strong>Serve Avatar URL:</strong> <a href="' . $serveUrl . '" target="_blank">' . $serveUrl . '</a></p>';
+        
+        // Check file sizes and modification times
+        if (file_exists($avatarPath)) {
+            $output .= '<p><strong>Avatar File Size:</strong> ' . filesize($avatarPath) . ' bytes</p>';
+            $output .= '<p><strong>Avatar Modified:</strong> ' . date('Y-m-d H:i:s', filemtime($avatarPath)) . '</p>';
+        }
+    }
+    
+    $output .= '<h3>Directory Contents:</h3>';
+    
+    // List avatar directory contents
+    $avatarDir = storage_path('app/public/avatars/');
+    if (is_dir($avatarDir)) {
+        $avatarFiles = scandir($avatarDir);
+        $output .= '<h4>Avatars Directory:</h4>';
+        foreach ($avatarFiles as $file) {
+            if ($file !== '.' && $file !== '..') {
+                $output .= '<p>• ' . $file . '</p>';
+            }
+        }
+    }
+    
+    // List game_images directory contents (first 10 files)
+    $gameDir = storage_path('app/public/game_images/');
+    if (is_dir($gameDir)) {
+        $gameFiles = array_slice(scandir($gameDir), 2, 10); // Skip . and .., get first 10
+        $output .= '<h4>Game Images Directory (first 10):</h4>';
+        foreach ($gameFiles as $file) {
+            $output .= '<p>• ' . $file . '</p>';
+        }
     }
     
     $output .= '<h3>All Users with Same Email:</h3>';
