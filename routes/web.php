@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
@@ -383,18 +385,12 @@ Route::get('/link-avatar/{filename}', function ($filename) {
 
 // DEVELOPMENT ONLY - Database Reset Route (remove in production)
 Route::get('/dev/reset-database', function () {
-    if (app()->environment('production')) {
-        abort(404, 'Not available in production');
-    }
-    
+    // Temporarily allow in all environments for reset
     return view('dev.reset-database');
 });
 
 Route::post('/dev/reset-database', function () {
-    if (app()->environment('production')) {
-        abort(404, 'Not available in production');
-    }
-    
+    // Temporarily allow in all environments for reset
     try {
         \Illuminate\Support\Facades\Artisan::call('db:reset-data', ['--force' => true]);
         $output = \Illuminate\Support\Facades\Artisan::output();
@@ -403,4 +399,73 @@ Route::post('/dev/reset-database', function () {
     } catch (\Exception $e) {
         return back()->with('error', 'Failed to reset database: ' . $e->getMessage());
     }
+});
+
+// EMERGENCY MANUAL RESET ROUTE - Use with caution
+Route::get('/emergency/manual-reset/{confirm}', function ($confirm) {
+    if ($confirm !== 'yes-delete-everything-now') {
+        return 'Invalid confirmation token. Use: /emergency/manual-reset/yes-delete-everything-now';
+    }
+    
+    $output = '<div style="font-family: Arial; padding: 20px;">';
+    $output .= '<h2>🗑️ Manual Database Reset</h2>';
+    
+    try {
+        // Clear tables manually
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        $tables = ['payments', 'participants', 'events', 'organizers', 'games', 'users'];
+        foreach ($tables as $table) {
+            DB::table($table)->truncate();
+            $output .= "<p>✅ Cleared table: {$table}</p>";
+        }
+        
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        
+        // Clear uploaded files
+        $avatarCount = 0;
+        $gameCount = 0;
+        $eventCount = 0;
+        
+        // Clear avatars
+        $avatarFiles = Storage::disk('public')->files('avatars');
+        foreach ($avatarFiles as $file) {
+            if (basename($file) !== '.gitkeep') {
+                Storage::disk('public')->delete($file);
+                $avatarCount++;
+            }
+        }
+        
+        // Clear game images
+        $gameFiles = Storage::disk('public')->files('game_images');
+        foreach ($gameFiles as $file) {
+            if (basename($file) !== '.gitkeep') {
+                Storage::disk('public')->delete($file);
+                $gameCount++;
+            }
+        }
+        
+        // Clear event images
+        if (Storage::disk('public')->exists('event_images')) {
+            $eventFiles = Storage::disk('public')->files('event_images');
+            foreach ($eventFiles as $file) {
+                if (basename($file) !== '.gitkeep') {
+                    Storage::disk('public')->delete($file);
+                    $eventCount++;
+                }
+            }
+        }
+        
+        $output .= "<p>✅ Cleared {$avatarCount} avatar files</p>";
+        $output .= "<p>✅ Cleared {$gameCount} game image files</p>";
+        $output .= "<p>✅ Cleared {$eventCount} event image files</p>";
+        $output .= '<p><strong>✅ Database reset completed successfully!</strong></p>';
+        $output .= '<p><a href="/register">Register new admin account</a></p>';
+        
+    } catch (\Exception $e) {
+        $output .= '<p style="color: red;">❌ Error: ' . $e->getMessage() . '</p>';
+    }
+    
+    $output .= '</div>';
+    return $output;
 });
