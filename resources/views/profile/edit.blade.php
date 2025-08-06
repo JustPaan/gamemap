@@ -319,7 +319,7 @@
             <label class="form-label">Profile Picture</label>
             <div class="avatar-container" style="margin: 0 auto; cursor: pointer; display: inline-block;">
                 @if($user->avatar)
-                    <img id="avatar-preview" class="avatar-preview" alt="Avatar Preview" src="{{ $user->avatar_url }}" onclick="document.getElementById('avatar-upload').click()" style="display: block; width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;">
+                    <img id="avatar-preview" class="avatar-preview" alt="Avatar Preview" src="{{ $user->avatar_url }}&t={{ time() }}" onclick="document.getElementById('avatar-upload').click()" style="display: block; width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;">
                     <div class="avatar-placeholder" onclick="document.getElementById('avatar-upload').click()" style="width: 60px; height: 60px; border-radius: 50%; background-color: #e0e0e0; display: none; justify-content: center; align-items: center; border: 2px solid var(--border-color);">
                         <span class="placeholder-icon" style="font-size: 30px; color: var(--text-secondary);">👤</span>
                     </div>

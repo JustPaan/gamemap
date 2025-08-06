@@ -173,7 +173,9 @@ public function organizerProfile()
             // Check if file exists in avatars directory
             $avatarPath = storage_path('app/public/avatars/' . $filename);
             if (file_exists($avatarPath)) {
-                return url('/serve_avatar.php?f=' . $filename);
+                // Add cache-busting parameter based on file modification time
+                $timestamp = filemtime($avatarPath);
+                return route('avatar.image', ['filename' => $filename]) . '?v=' . $timestamp;
             }
             
             // Check if avatar is mistakenly pointing to game image

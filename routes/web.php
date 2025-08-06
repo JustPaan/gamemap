@@ -43,6 +43,23 @@ Route::get('/storage/game_images/{filename}', function ($filename) {
     ]);
 })->name('game.image');
 
+// Avatar serving route for better compatibility
+Route::get('/storage/avatars/{filename}', function ($filename) {
+    $path = storage_path('app/public/avatars/' . $filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    
+    $mimeType = mime_content_type($path);
+    return response()->file($path, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'no-cache, no-store, must-revalidate', // Prevent caching for avatars
+        'Pragma' => 'no-cache',
+        'Expires' => '0',
+    ]);
+})->name('avatar.image');
+
 // Authentication Routes
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLogin')->name('login');
@@ -383,147 +400,3 @@ Route::get('/link-avatar/{filename}', function ($filename) {
     return redirect('/debug-avatar')->with('message', 'Avatar linked successfully! Check your profile now.');
 })->middleware('auth');
 
-// SIMPLE DATABASE RESET ROUTE
-Route::get('/dev/reset-database', function () {
-    $html = '<!DOCTYPE html>
-    <html><head><title>Database Reset</title>
-    <style>body{font-family:Arial;padding:20px;background:#f5f5f5;}
-    .container{max-width:600px;margin:0 auto;background:white;padding:30px;border-radius:10px;}
-    .btn{background:#dc3545;color:white;padding:15px 30px;border:none;border-radius:5px;font-size:16px;cursor:pointer;}
-    .btn:hover{background:#c82333;} .warning{background:#fff3cd;padding:15px;border-radius:5px;margin:20px 0;}
-    </style></head><body><div class="container">
-    <h1>🗑️ Database Reset Tool</h1>
-    <div class="warning"><h3>⚠️ WARNING</h3>
-    <p>This will permanently delete ALL data including users, games, events, and uploaded files!</p></div>
-    <form method="POST"><input type="hidden" name="_token" value="' . csrf_token() . '">
-    <button type="submit" class="btn" onclick="return confirm(\'Are you sure? This cannot be undone!\')">
-    RESET ALL DATA</button></form></div></body></html>';
-    return $html;
-});
-
-Route::post('/dev/reset-database', function () {
-    try {
-        // Clear tables manually
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        
-        $tables = ['payments', 'participants', 'events', 'organizers', 'games', 'users'];
-        $cleared = [];
-        
-        foreach ($tables as $table) {
-            try {
-                DB::table($table)->truncate();
-                $cleared[] = $table;
-            } catch (\Exception $e) {
-                // Skip if table doesn\'t exist
-            }
-        }
-        
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
-        
-        // Clear files
-        $avatarCount = $gameCount = $eventCount = 0;
-        
-        try {
-            if (Storage::disk('public')->exists('avatars')) {
-                $files = Storage::disk('public')->files('avatars');
-                foreach ($files as $file) {
-                    if (basename($file) !== '.gitkeep') {
-                        Storage::disk('public')->delete($file);
-                        $avatarCount++;
-                    }
-                }
-            }
-            
-            if (Storage::disk('public')->exists('game_images')) {
-                $files = Storage::disk('public')->files('game_images');
-                foreach ($files as $file) {
-                    if (basename($file) !== '.gitkeep') {
-                        Storage::disk('public')->delete($file);
-                        $gameCount++;
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            // Continue even if file operations fail
-        }
-        
-        return '<html><body style="font-family:Arial;padding:20px;"><div style="max-width:600px;margin:0 auto;background:white;padding:30px;border-radius:10px;">
-        <h1>✅ Database Reset Successful!</h1>
-        <p>Cleared tables: ' . implode(', ', $cleared) . '</p>
-        <p>Cleared ' . $avatarCount . ' avatar files and ' . $gameCount . ' game images</p>
-        <p><a href="/register" style="background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Register New Account</a></p>
-        </div></body></html>';
-        
-    } catch (\Exception $e) {
-        return '<html><body style="font-family:Arial;padding:20px;color:red;"><h1>❌ Reset Failed</h1><p>' . $e->getMessage() . '</p><p><a href="/dev/reset-database">Try Again</a></p></body></html>';
-    }
-});
-
-// EMERGENCY MANUAL RESET ROUTE - Use with caution
-Route::get('/emergency/manual-reset/{confirm}', function ($confirm) {
-    if ($confirm !== 'yes-delete-everything-now') {
-        return 'Invalid confirmation token. Use: /emergency/manual-reset/yes-delete-everything-now';
-    }
-    
-    $output = '<div style="font-family: Arial; padding: 20px;">';
-    $output .= '<h2>🗑️ Manual Database Reset</h2>';
-    
-    try {
-        // Clear tables manually
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        
-        $tables = ['payments', 'participants', 'events', 'organizers', 'games', 'users'];
-        foreach ($tables as $table) {
-            DB::table($table)->truncate();
-            $output .= "<p>✅ Cleared table: {$table}</p>";
-        }
-        
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
-        
-        // Clear uploaded files
-        $avatarCount = 0;
-        $gameCount = 0;
-        $eventCount = 0;
-        
-        // Clear avatars
-        $avatarFiles = Storage::disk('public')->files('avatars');
-        foreach ($avatarFiles as $file) {
-            if (basename($file) !== '.gitkeep') {
-                Storage::disk('public')->delete($file);
-                $avatarCount++;
-            }
-        }
-        
-        // Clear game images
-        $gameFiles = Storage::disk('public')->files('game_images');
-        foreach ($gameFiles as $file) {
-            if (basename($file) !== '.gitkeep') {
-                Storage::disk('public')->delete($file);
-                $gameCount++;
-            }
-        }
-        
-        // Clear event images
-        if (Storage::disk('public')->exists('event_images')) {
-            $eventFiles = Storage::disk('public')->files('event_images');
-            foreach ($eventFiles as $file) {
-                if (basename($file) !== '.gitkeep') {
-                    Storage::disk('public')->delete($file);
-                    $eventCount++;
-                }
-            }
-        }
-        
-        $output .= "<p>✅ Cleared {$avatarCount} avatar files</p>";
-        $output .= "<p>✅ Cleared {$gameCount} game image files</p>";
-        $output .= "<p>✅ Cleared {$eventCount} event image files</p>";
-        $output .= '<p><strong>✅ Database reset completed successfully!</strong></p>';
-        $output .= '<p><a href="/register">Register new admin account</a></p>';
-        
-    } catch (\Exception $e) {
-        $output .= '<p style="color: red;">❌ Error: ' . $e->getMessage() . '</p>';
-    }
-    
-    $output .= '</div>';
-    return $output;
-});

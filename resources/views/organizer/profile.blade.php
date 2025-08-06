@@ -34,7 +34,7 @@
                 <div class="space-y-4">
                     <div class="bg-gray-200 h-48 flex items-center justify-center rounded overflow-hidden cursor-pointer" onclick="document.getElementById('profile-upload').click()">
                         @if($organizer->avatar)
-                            <img id="profile-preview" src="{{ $organizer->avatar_url }}" alt="Profile Picture" class="w-full h-full object-cover">
+                            <img id="profile-preview" src="{{ $organizer->avatar_url }}&t={{ time() }}" alt="Profile Picture" class="w-full h-full object-cover">
                             <span id="upload-text" class="text-gray-600 hidden absolute">Click to change profile picture</span>
                         @else
                             <span id="upload-text" class="text-gray-600">Click to upload profile picture</span>

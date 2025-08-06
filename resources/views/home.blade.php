@@ -225,7 +225,7 @@
 
     <!-- User Profile Section -->
     <div class="profile-card">
-        <img src="{{ Auth::check() && Auth::user()->avatar ? Auth::user()->avatar_url : asset('images/default-avatar.png') }}" 
+        <img src="{{ Auth::check() && Auth::user()->avatar ? Auth::user()->avatar_url . '&t=' . time() : asset('images/default-avatar.png') }}" 
              alt="User Avatar" class="avatar"
              onerror="this.onerror=null; this.src='/images/default-avatar.png';"
              onload="console.log('Avatar loaded successfully:', this.src);">
