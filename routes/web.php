@@ -105,21 +105,21 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::post('/profile/update', 'update')->name('profile.update');
         Route::get('/profile/info', 'info')->name('profile.info');
+    });
 
-    // Add this with your other game routes
-Route::controller(GameController::class)->group(function () {
-    Route::get('/games', 'publicIndex')->name('games.public.index');
-    Route::get('/games/search', 'search')->name('games.search'); // Add this line
-    Route::get('/games/{game}', 'show')->name('games.show');
-});
+    // Game routes
+    Route::controller(GameController::class)->group(function () {
+        Route::get('/games', 'publicIndex')->name('games.public.index');
+        Route::get('/games/search', 'search')->name('games.search');
+        Route::get('/games/{game}', 'show')->name('games.show');
+    });
 
     // Event Management for Normal Users
     Route::controller(EventController::class)->name('events.')->group(function () {
         Route::get('/events', 'publicIndex')->name('public.index');
         Route::get('/events/{event}', 'publicShow')->name('public.show');
-        Route::get('/events/{event}/edit', 'edit')->name('edit'); // Add this line
+        Route::get('/events/{event}/edit', 'edit')->name('edit');
         Route::put('/events/{event}', 'update')->name('update');
-    });    
     });
 Route::get('/admin/organizers/create', [AdminOrganizerController::class, 'create'])->name('admin.organizers.create');
     /*
@@ -262,141 +262,4 @@ Route::get('/admin/organizers/create', [AdminOrganizerController::class, 'create
         return redirect()->route('home');
     })->middleware(['auth', 'can:organizer-access'])->name('organizer.pending');
 });
-
-// TEMPORARY DEBUG ROUTE - Check what's happening with avatar on refresh
-Route::get('/debug-avatar', function () {
-    if (!auth()->check()) {
-        return 'Not logged in';
-    }
-    
-    $user = auth()->user();
-    $output = '<div style="font-family: Arial; padding: 20px; background: #f5f5f5;">';
-    $output .= '<h2>Avatar Debug Information (Refresh Issue)</h2>';
-    $output .= '<p><strong>User ID:</strong> ' . $user->id . '</p>';
-    $output .= '<p><strong>Name:</strong> ' . $user->name . '</p>';
-    $output .= '<p><strong>Avatar (DB):</strong> ' . ($user->avatar ?? 'NULL') . '</p>';
-    $output .= '<p><strong>Avatar URL:</strong> ' . $user->avatar_url . '</p>';
-    $output .= '<p><strong>Current Time:</strong> ' . now() . '</p>';
-    
-    // Check if avatar file exists
-    if ($user->avatar) {
-        $filename = basename($user->avatar);
-        $avatarPath = storage_path('app/public/avatars/' . $filename);
-        $gameImagePath = storage_path('app/public/game_images/' . $filename);
-        
-        $output .= '<h3>File Status:</h3>';
-        $output .= '<p><strong>Filename:</strong> ' . $filename . '</p>';
-        $output .= '<p><strong>Avatar Path:</strong> ' . $avatarPath . '</p>';
-        $output .= '<p><strong>Avatar Exists:</strong> ' . (file_exists($avatarPath) ? '✅ YES' : '❌ NO') . '</p>';
-        $output .= '<p><strong>Game Image Path:</strong> ' . $gameImagePath . '</p>';
-        $output .= '<p><strong>Game Image Exists:</strong> ' . (file_exists($gameImagePath) ? '⚠️ YES - PROBLEM!' : '✅ NO') . '</p>';
-        
-        // Check what serve_avatar.php would serve
-        $serveUrl = url('/serve_avatar.php?f=' . $filename);
-        $output .= '<p><strong>Serve Avatar URL:</strong> <a href="' . $serveUrl . '" target="_blank">' . $serveUrl . '</a></p>';
-        
-        // Check file sizes and modification times
-        if (file_exists($avatarPath)) {
-            $output .= '<p><strong>Avatar File Size:</strong> ' . filesize($avatarPath) . ' bytes</p>';
-            $output .= '<p><strong>Avatar Modified:</strong> ' . date('Y-m-d H:i:s', filemtime($avatarPath)) . '</p>';
-        }
-        
-        // Add fix button if avatar file is missing
-        if (!file_exists($avatarPath)) {
-            $output .= '<h3 style="color: red;">⚠️ AVATAR FILE MISSING!</h3>';
-            $output .= '<p>Your database has an avatar filename but the file doesn\'t exist on the server.</p>';
-            $output .= '<p><a href="/fix-missing-avatar" style="background: green; color: white; padding: 10px; text-decoration: none;">Reset Avatar to Allow New Upload</a></p>';
-        }
-    } else {
-        $output .= '<h3>No Avatar Set (Database is NULL)</h3>';
-        $output .= '<p>This means you can upload a new avatar and it should work.</p>';
-    }
-    
-    $output .= '<h3>Directory Contents:</h3>';
-    
-    // List avatar directory contents
-    $avatarDir = storage_path('app/public/avatars/');
-    if (is_dir($avatarDir)) {
-        $avatarFiles = scandir($avatarDir);
-        $output .= '<h4>Avatars Directory:</h4>';
-        foreach ($avatarFiles as $file) {
-            if ($file !== '.' && $file !== '..') {
-                $filePath = $avatarDir . $file;
-                $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
-                $fileTime = file_exists($filePath) ? date('Y-m-d H:i:s', filemtime($filePath)) : 'Unknown';
-                $output .= '<p>• ' . $file . ' (' . $fileSize . ' bytes, modified: ' . $fileTime . ')</p>';
-                
-                // If this file exists but isn't in database, offer to fix it
-                if ($file !== 'gitkeep' && !$user->avatar) {
-                    $output .= '<p style="margin-left: 20px; color: orange;">⚠️ This file exists but isn\'t linked to your account!</p>';
-                    $output .= '<p style="margin-left: 20px;"><a href="/link-avatar/' . urlencode($file) . '" style="background: blue; color: white; padding: 5px; text-decoration: none;">Link This File</a></p>';
-                }
-            }
-        }
-    }
-    
-    // List game_images directory contents (first 10 files)
-    $gameDir = storage_path('app/public/game_images/');
-    if (is_dir($gameDir)) {
-        $gameFiles = array_slice(scandir($gameDir), 2, 10); // Skip . and .., get first 10
-        $output .= '<h4>Game Images Directory (first 10):</h4>';
-        foreach ($gameFiles as $file) {
-            $output .= '<p>• ' . $file . '</p>';
-        }
-    }
-    
-    $output .= '<h3>All Users with Same Email:</h3>';
-    $duplicates = \App\Models\User::where('email', $user->email)->get();
-    foreach ($duplicates as $dup) {
-        $output .= '<div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0;">';
-        $output .= '<p><strong>ID:</strong> ' . $dup->id . ' | <strong>Name:</strong> ' . $dup->name . ' | <strong>Avatar:</strong> ' . ($dup->avatar ?? 'NULL') . ' | <strong>Created:</strong> ' . $dup->created_at . '</p>';
-        $output .= '</div>';
-    }
-    
-    $output .= '</div>';
-    return $output;
-})->middleware('auth');
-
-// TEMPORARY FIX ROUTE - Fix missing avatar file issue
-Route::get('/fix-missing-avatar', function () {
-    if (!auth()->check()) {
-        return redirect('/login');
-    }
-    
-    $user = auth()->user();
-    
-    // Reset avatar to null so user can upload a new one
-    \App\Models\User::where('id', $user->id)->update(['avatar' => null]);
-    
-    return redirect('/debug-avatar')->with('message', 'Avatar reset! The database has been cleared. You can now upload a new profile picture and it will work properly.');
-})->middleware('auth');
-
-// TEMPORARY LINK ROUTE - Link existing avatar file to user account
-Route::get('/link-avatar/{filename}', function ($filename) {
-    if (!auth()->check()) {
-        return redirect('/login');
-    }
-    
-    $user = auth()->user();
-    $filename = urldecode($filename);
-    
-    // Security check - only allow certain file types
-    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-    
-    if (!in_array($extension, $allowedExtensions)) {
-        return redirect('/debug-avatar')->with('message', 'Invalid file type.');
-    }
-    
-    // Check if file exists
-    $avatarPath = storage_path('app/public/avatars/' . $filename);
-    if (!file_exists($avatarPath)) {
-        return redirect('/debug-avatar')->with('message', 'File does not exist.');
-    }
-    
-    // Update user's avatar field
-    \App\Models\User::where('id', $user->id)->update(['avatar' => $filename]);
-    
-    return redirect('/debug-avatar')->with('message', 'Avatar linked successfully! Check your profile now.');
-})->middleware('auth');
 
