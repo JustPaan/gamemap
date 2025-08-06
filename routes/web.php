@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
@@ -64,9 +62,6 @@ Route::controller(EventController::class)->name('events.')->group(function () {
 // Authenticated Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-    Route::post('/stripe/webhook', [EventController::class, 'handleWebhook'])
-         ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
     
 
     Route::controller(ProfileController::class)->group(function () {
@@ -115,18 +110,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{user}', [AdminController::class, 'showOrganizer'])->name('show');
         });
 
-        // Organizer CRUD
+        // Organizer CRUD - Simplified
         Route::controller(AdminOrganizerController::class)->prefix('organizers')->name('organizers.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
-            Route::resource('admin/organizers', AdminOrganizerController::class)->except(['create', 'edit']);
             Route::post('/', 'store')->name('store');
             Route::get('/{id}/edit', 'edit')->name('edit');
             Route::put('/{id}', 'update')->name('update');
             Route::delete('/{id}', 'destroy')->name('destroy');
-            Route::put('/bulk-update', 'bulkUpdate')->name('bulkUpdate');
-            Route::get('/{id}/demote', 'demote')->name('demote');
-            Route::get('/cancel', 'cancel')->name('cancel');
         });
 
         // Game Management
@@ -174,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
     | Organizer Routes (requires organizer role AND approval)
     |--------------------------------------------------------------------------
     */
+    /* Temporarily disabled for deployment
     Route::middleware(['auth', 'can:organizer-access', 'organizer.approved'])->group(function () {
         Route::get('/organizer/dashboard', [OrganizerController::class, 'dashboard'])->name('organizer.dashboard');
 
@@ -207,12 +199,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/organizer/analytics', [OrganizerAnalyticController::class, 'index'])->name('organizer.analytic');
         });
     });
+    */
 
     /*
     |--------------------------------------------------------------------------
     | Gamer Routes (requires gamer role)
     |--------------------------------------------------------------------------
     */
+    /* Temporarily disabled for deployment
     Route::middleware(['can:gamer-access'])->prefix('gamer')->name('gamer.')->controller(GameController::class)->group(function () {
         Route::get('/home', 'home')->name('home');
         Route::get('/events', 'events')->name('events');
@@ -220,6 +214,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/events/{event}/register', 'registerEvent')->name('events.register');
         Route::get('/games', 'showGames')->name('games');
     });
+    */
 
     /*
     |--------------------------------------------------------------------------
