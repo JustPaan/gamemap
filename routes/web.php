@@ -380,3 +380,27 @@ Route::get('/link-avatar/{filename}', function ($filename) {
     
     return redirect('/debug-avatar')->with('message', 'Avatar linked successfully! Check your profile now.');
 })->middleware('auth');
+
+// DEVELOPMENT ONLY - Database Reset Route (remove in production)
+Route::get('/dev/reset-database', function () {
+    if (app()->environment('production')) {
+        abort(404, 'Not available in production');
+    }
+    
+    return view('dev.reset-database');
+});
+
+Route::post('/dev/reset-database', function () {
+    if (app()->environment('production')) {
+        abort(404, 'Not available in production');
+    }
+    
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:reset-data', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        
+        return back()->with('success', 'Database reset completed successfully!')->with('output', $output);
+    } catch (\Exception $e) {
+        return back()->with('error', 'Failed to reset database: ' . $e->getMessage());
+    }
+});
