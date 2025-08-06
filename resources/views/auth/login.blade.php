@@ -9,93 +9,128 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            background-color: #0f0f1a;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .login-container {
+            width: 100%;
             max-width: 400px;
-            padding: 30px;
-            border-radius: 10px;
-            background-color: #1e1e2e;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.5s ease-in-out;
+            padding: 40px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        .form-control {
-            background-color: #2d2d3d;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-        }
-        .form-control:focus {
-            background-color: #2d2d3d;
-            color: white;
-            border-color: #7c3aed;
-            box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
-        }
-        .btn-primary {
-            background-color: #7c3aed;
-            border-color: #7c3aed;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            width: 100%;
-        }
-        .btn-primary:hover {
-            background-color: #6d28d9;
-            border-color: #6d28d9;
-        }
-        .form-label {
-            color: #e5e7eb;
-            margin-bottom: 5px;
-            font-weight: 500;
         }
         .title {
             text-align: center;
-            color: #7c3aed;
-            font-size: 2rem;
-            font-weight: bold;
+            color: #1c1e21;
+            font-size: 24px;
+            font-weight: 600;
             margin-bottom: 30px;
+            line-height: 1.2;
+        }
+        .form-label {
+            color: #606770;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            display: block;
+        }
+        .form-control {
+            background-color: #ffffff;
+            color: #1c1e21;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            padding: 14px 16px;
+            font-size: 17px;
+            line-height: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus {
+            background-color: #ffffff;
+            color: #1c1e21;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+            outline: none;
+        }
+        .form-control::placeholder {
+            color: #8a8d91;
+        }
+        .btn-primary {
+            background-color: #1877f2;
+            border: none;
+            padding: 14px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 17px;
+            width: 100%;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 6px;
+        }
+        .btn-primary:hover {
+            background-color: #166fe5;
+        }
+        .btn-primary:active {
+            background-color: #1464cc;
+        }
+        .signup-text {
+            text-align: center;
+            margin-top: 28px;
+            color: #606770;
+            font-size: 14px;
         }
         .text-link {
-            color: #7c3aed;
+            color: #1877f2;
             text-decoration: none;
+            font-weight: 500;
         }
         .text-link:hover {
-            color: #8b5cf6;
             text-decoration: underline;
         }
         .alert {
-            background-color: #1f2937;
-            border: 1px solid #374151;
-            color: #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            border-radius: 6px;
+            padding: 12px 16px;
             margin-bottom: 20px;
+            font-size: 14px;
         }
         .alert-success {
-            background-color: #065f46;
-            border-color: #059669;
-            color: #d1fae5;
+            background-color: #d1edff;
+            border-color: #bee5eb;
+            color: #0c5460;
         }
         .text-danger {
-            color: #ef4444 !important;
+            color: #e41e3f !important;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .mb-3 {
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h1 class="title">GameMap</h1>
+        <h1 class="title">Log in to GameMap</h1>
         
         @if(session('success'))
         <div class="alert alert-success">
@@ -119,12 +154,12 @@
             <button type="submit" class="btn btn-primary">Log In</button>
 
             @if(session('error'))
-            <p class="text-danger mt-3 text-center">{{ session('error') }}</p>
+            <p class="text-danger">{{ session('error') }}</p>
             @endif
         </form>
         
-        <div class="text-center mt-3">
-            <span class="text-muted">Don't have an account? </span>
+        <div class="signup-text">
+            <span>Don't have an account? </span>
             <a href="{{ route('register') }}" class="text-link">Sign up</a>
         </div>
     </div>
