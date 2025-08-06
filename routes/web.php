@@ -28,38 +28,6 @@ use App\Http\Controllers\Organizer\OrganizerEventSettingController;
 // Redirect root to login
 Route::redirect('/', '/login');
 
-// Image serving route for Digital Ocean compatibility
-Route::get('/storage/game_images/{filename}', function ($filename) {
-    $path = storage_path('app/public/game_images/' . $filename);
-    
-    if (!file_exists($path)) {
-        abort(404);
-    }
-    
-    $mimeType = mime_content_type($path);
-    return response()->file($path, [
-        'Content-Type' => $mimeType,
-        'Cache-Control' => 'public, max-age=31536000',
-    ]);
-})->name('game.image');
-
-// Avatar serving route for better compatibility
-Route::get('/storage/avatars/{filename}', function ($filename) {
-    $path = storage_path('app/public/avatars/' . $filename);
-    
-    if (!file_exists($path)) {
-        abort(404);
-    }
-    
-    $mimeType = mime_content_type($path);
-    return response()->file($path, [
-        'Content-Type' => $mimeType,
-        'Cache-Control' => 'no-cache, no-store, must-revalidate', // Prevent caching for avatars
-        'Pragma' => 'no-cache',
-        'Expires' => '0',
-    ]);
-})->name('avatar.image');
-
 // Authentication Routes
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLogin')->name('login');
@@ -121,7 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/events/{event}/edit', 'edit')->name('edit');
         Route::put('/events/{event}', 'update')->name('update');
     });
-Route::get('/admin/organizers/create', [AdminOrganizerController::class, 'create'])->name('admin.organizers.create');
+
     /*
     |--------------------------------------------------------------------------
     | Admin Routes (requires 'can:admin-access')
@@ -131,6 +99,9 @@ Route::get('/admin/organizers/create', [AdminOrganizerController::class, 'create
         // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/home', fn () => redirect()->route('admin.dashboard'));
+
+        // Admin organizer create route
+        Route::get('/organizers/create', [AdminOrganizerController::class, 'create'])->name('organizers.create');
 
         // Organizer Approval
         Route::prefix('organizers')->name('organizers.')->group(function () {

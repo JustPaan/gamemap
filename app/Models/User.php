@@ -167,26 +167,18 @@ public function organizerProfile()
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            // Use direct image server for Digital Ocean compatibility
+            // Use standard Laravel storage URL for better compatibility
             $filename = basename($this->avatar);
             
             // Check if file exists in avatars directory
             $avatarPath = storage_path('app/public/avatars/' . $filename);
             if (file_exists($avatarPath)) {
-                // Add cache-busting parameter based on file modification time
+                // Use Laravel's asset function with cache-busting
                 $timestamp = filemtime($avatarPath);
-                return route('avatar.image', ['filename' => $filename]) . '?v=' . $timestamp;
+                return asset('storage/avatars/' . $filename) . '?v=' . $timestamp;
             }
             
-            // Check if avatar is mistakenly pointing to game image
-            $gameImagePath = storage_path('app/public/game_images/' . $filename);
-            if (file_exists($gameImagePath)) {
-                // Log this issue and fall back to default
-                \Illuminate\Support\Facades\Log::warning("User {$this->id} avatar points to game image: {$filename}");
-                return asset('images/default-avatar.png');
-            }
-            
-            // If file doesn't exist anywhere, log it and fall back to default
+            // If file doesn't exist, log it and fall back to default
             \Illuminate\Support\Facades\Log::warning("Avatar file not found for user {$this->id}: {$avatarPath}");
         }
         
