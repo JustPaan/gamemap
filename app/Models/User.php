@@ -167,19 +167,9 @@ public function organizerProfile()
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            // Use standard Laravel storage URL for better compatibility
+            // Simple asset URL without file system checks during build
             $filename = basename($this->avatar);
-            
-            // Check if file exists in avatars directory
-            $avatarPath = storage_path('app/public/avatars/' . $filename);
-            if (file_exists($avatarPath)) {
-                // Use Laravel's asset function with cache-busting
-                $timestamp = filemtime($avatarPath);
-                return asset('storage/avatars/' . $filename) . '?v=' . $timestamp;
-            }
-            
-            // If file doesn't exist, log it and fall back to default
-            \Illuminate\Support\Facades\Log::warning("Avatar file not found for user {$this->id}: {$avatarPath}");
+            return asset('storage/avatars/' . $filename) . '?v=' . time();
         }
         
         return asset('images/default-avatar.png');
